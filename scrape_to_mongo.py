@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import uuid
+import os
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse
@@ -122,8 +123,13 @@ def scrape_new_articles(limit: int = 0) -> dict:
         limit: Maximum number of articles to insert (0 = no limit)
     """
     bootstrap_env(__file__)
-    client = MongoClient("mongodb://localhost:27017")
-    db = client["megallm"]
+    
+    # Use environment variables for MongoDB connection
+    mongodb_uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+    mongodb_db = os.getenv("MONGODB_DB", "megallm")
+    
+    client = MongoClient(mongodb_uri)
+    db = client[mongodb_db]
     articles = db.articles
     scrape_run_id = str(uuid.uuid4())
 
