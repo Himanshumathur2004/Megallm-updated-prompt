@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MegaLLM Blog Generation Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+            border-left: 5px solid #3b82f6;
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            color: #0f172a;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: #64748b;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .account-selector {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0 0 0;
+            flex-wrap: wrap;
+        }
+
+        .account-btn {
+            padding: 10px 18px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            font-size: 14px;
+            color: #64748b;
+            position: relative;
+        }
+
+        .account-btn:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
+        }
+
+        .account-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+            border-color: #cbd5e1;
+        }
+
+        .stat-card h3 {
+            color: #94a3b8;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+
+        .stat-card .number {
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+
+        .status-breakdown {
+            margin-top: 16px;
+            font-size: 13px;
+            display: flex;
+            gap: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-item .label {
+            color: #94a3b8;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-item .value {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 22px;
+        }
+
+        .controls {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 12px;
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-post {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            box-shadow: 0 8px 16px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-post:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(245, 158, 11, 0.3);
+        }
+
+        .blogs-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 14px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .blogs-header {
+            padding: 24px 28px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .blogs-header h2 {
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: #cbd5e1;
+            color: #475569;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+        }
+
+        .blogs-list {
+            list-style: none;
+            max-height: 700px;
+            overflow-y: auto;
+        }
+
+        .blogs-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .blogs-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .blogs-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .blogs-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .blog-item {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .blog-item:hover {
+            background: #f8fafc;
+        }
+
+        .blog-item.posted {
+            opacity: 0.85;
+            background: #f0fdf4;
+        }
+
+        .blog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .blog-title {
+            font-weight: 700;
+            color: #0f172a;
+            flex: 1;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .blog-topic {
+            display: inline-block;
+            padding: 5px 12px;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            border: 1px solid #93c5fd;
+        }
+
+        .blog-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .blog-status.draft {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .blog-status.posted {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .blog-preview {
+            color: #64748b;
+            font-size: 14px;
+            margin: 10px 0;
+            line-height: 1.5;
+            max-height: 3em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .blog-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+            font-size: 12px;
+            color: #94a3b8;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .blog-meta {
+            display: flex;
+            gap: 16px;
+        }
+
+        .blog-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 650px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            border: 1px solid #e2e8f0;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #ef4444;
+            transform: scale(1.1);
+        }
+
+        .copy-section {
+            margin-bottom: 24px;
+        }
+
+        .copy-section h3 {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+        }
+
+        .copy-text {
+            background: #f1f5f9;
+            padding: 14px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            max-height: 180px;
+            overflow-y: auto;
+            word-break: break-word;
+            white-space: pre-wrap;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: #475569;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #94a3b8;
+        }
+
+        .empty-state-icon {
+            font-size: 56px;
+            margin-bottom: 18px;
+            opacity: 0.6;
+        }
+
+        .empty-state p {
+            font-size: 15px;
+            color: #64748b;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1e293b;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 24px 20px;
+            }
+
+            header h1 {
+                font-size: 22px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .blogs-container {
+                margin-top: 20px;
+            }
+
+            .blog-item {
+                padding: 14px 16px;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .blogs-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .filter-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .filter-btn {
+                flex: 1;
+            }
+
+            .modal-content {
+                padding: 24px;
+            }
+
+            .stat-card .number {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 MegaLLM Blog Studio</h1>
+            <p>Intelligent blog generation platform for CTOs. 12 high-quality blogs every 24 hours across 5 accounts.</p>
+            
+            <div class="account-selector" id="accountSelector"></div>
+        </header>
+
+        <div class="dashboard" id="dashboard">
+            <div class="stat-card">
+                <h3>📊 Total Blogs</h3>
+                <div class="number" id="totalBlogs">0</div>
+                <div class="status-breakdown">
+                    <div class="status-item">
+                        <div class="label">✎ Draft</div>
+                        <div class="value" id="draftCount">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="label">✓ Posted</div>
+                        <div class="value" id="postedCount">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3>🏷️ By Topic</h3>
+                <div id="blogsByTopic" style="margin-top: 12px; font-size: 14px;"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="generateBlogsNow()" style="font-size: 15px;">
+                <span id="generateBtnText">🚀 Generate Blogs Now</span>
+            </button>
+            <button class="btn btn-secondary" onclick="refreshDashboard()">🔄 Refresh Stats</button>
+            <button class="btn btn-secondary" onclick="toggleGenerationHistory()">📋 Generation Log</button>
+        </div>
+
+        <div class="blogs-container">
+            <div class="blogs-header">
+                <h2>✨ Blog Library</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterBlogs('all')">📚 All</button>
+                    <button class="filter-btn" onclick="filterBlogs('draft')">✎ Draft</button>
+                    <button class="filter-btn" onclick="filterBlogs('posted')">✓ Posted</button>
+                </div>
+            </div>
+            <ul class="blogs-list" id="blogsList"></ul>
+        </div>
+    </div>
+
+    <!-- Copy Modal -->
+    <div class="modal" id="copyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📋 Copy Blog Content</span>
+                <button class="close-btn" onclick="closeCopyModal()">×</button>
+            </div>
+
+            <div id="copyModalContent"></div>
+
+            <div style="display: flex; gap: 10px; margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="closeCopyModal()" style="flex: 1;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generation History Modal -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📋 Generation Log</span>
+                <button class="close-btn" onclick="closeHistoryModal()">×</button>
+            </div>
+
+            <div id="historyContent"></div>
+
+            <div style="display: flex; gap: 10px; margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="closeHistoryModal()" style="flex: 1;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentAccount = null;
+        let currentFilter = 'all';
+        let blogs = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadAccounts();
+            await refreshDashboard();
+        });
+
+        // Load accounts and initialize UI
+        async function loadAccounts() {
+            try {
+                const response = await fetch(`${API_BASE}/accounts`);
+                const data = await response.json();
+                const selector = document.getElementById('accountSelector');
+                
+                data.accounts.forEach(account => {
+                    const btn = document.createElement('button');
+                    btn.className = 'account-btn';
+                    btn.textContent = account.name;
+                    btn.onclick = () => selectAccount(account.account_id, btn);
+                    selector.appendChild(btn);
+                });
+
+                // Select first account by default
+                if (data.accounts.length > 0) {
+                    selectAccount(data.accounts[0].account_id, selector.children[0]);
+                }
+            } catch (err) {
+                console.error('Error loading accounts:', err);
+                showToast('Error loading accounts', 'error');
+            }
+        }
+
+        // Select account
+        function selectAccount(accountId, element) {
+            currentAccount = accountId;
+            currentFilter = 'all';  // Reset filter when switching accounts
+            document.querySelectorAll('.account-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            // Reset filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            const allFilterBtn = document.querySelector('.filter-btn');
+            if (allFilterBtn) allFilterBtn.classList.add('active');
+            refreshDashboard();
+        }
+
+        // Refresh dashboard
+        async function refreshDashboard() {
+            if (!currentAccount) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/dashboard/${currentAccount}`);
+                const data = await response.json();
+
+                // Update stats
+                const totalBlogs = data.total_blogs || 0;
+                const draftBlogs = data.status_breakdown?.draft || 0;
+                const postedBlogs = data.status_breakdown?.posted || 0;
+
+                document.getElementById('totalBlogs').textContent = totalBlogs;
+                document.getElementById('draftCount').textContent = draftBlogs;
+                document.getElementById('postedCount').textContent = postedBlogs;
+
+                // Update blogs by topic
+                const topicHtml = Object.entries(data.blogs_by_topic || {})
+                    .map(([topic, count]) => `<div>• ${topic}: <strong>${count}</strong> blogs</div>`)
+                    .join('');
+                document.getElementById('blogsByTopic').innerHTML = topicHtml || '<div>No blogs yet</div>';
+
+                // Load blogs
+                await loadBlogs();
+            } catch (err) {
+                console.error('Error refreshing dashboard:', err);
+                showToast('Error refreshing dashboard', 'error');
+            }
+        }
+
+        // Load blogs for current account
+        async function loadBlogs() {
+            if (!currentAccount) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/blogs?account_id=${currentAccount}`);
+                const data = await response.json();
+                blogs = data.blogs || [];
+
+                renderBlogs();
+            } catch (err) {
+                console.error('Error loading blogs:', err);
+                showToast('Error loading blogs', 'error');
+            }
+        }
+
+        // Filter and render blogs
+        function filterBlogs(status) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderBlogs();
+        }
+
+        // Render blogs list
+        function renderBlogs() {
+            const blogsList = document.getElementById('blogsList');
+            let filtered = blogs;
+
+            if (currentFilter !== 'all') {
+                filtered = blogs.filter(b => b.status === currentFilter);
+            }
+
+            if (filtered.length === 0) {
+                blogsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div>No blogs yet. Generate some to get started!</div>';
+                return;
+            }
+
+            blogsList.innerHTML = filtered.map(blog => `
+                <li class="blog-item ${blog.status === 'posted' ? 'posted' : ''}">
+                    <div class="blog-header">
+                        <div class="blog-title">${escapeHtml(blog.title)}</div>
+                        <span class="blog-topic">${blog.topic}</span>
+                        <span class="blog-status ${blog.status}">${blog.status}</span>
+                    </div>
+                    <div class="blog-preview">${escapeHtml(blog.body?.substring(0, 150) + '...')}</div>
+                    <div class="blog-footer">
+                        <div class="blog-meta">
+                            <span>📅 ${new Date(blog.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div class="blog-actions">
+                            <button class="btn btn-sm btn-copy" onclick="openCopyModal('${blog._id}')">📋 Copy</button>
+                            ${blog.status === 'draft' ? `<button class="btn btn-sm btn-post" onclick="markPosted('${blog._id}')">✅ Mark Posted</button>` : ''}
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // Open copy modal
+        async function openCopyModal(blogId) {
+            try {
+                const response = await fetch(`${API_BASE}/blogs/${blogId}/copy`);
+                const blog = await response.json();
+
+                const content = `
+                    <div class="copy-section">
+                        <h3>Title</h3>
+                        <div class="copy-text" id="copyTitle">${escapeHtml(blog.title)}</div>
+                        <button class="btn btn-sm btn-copy" onclick="copyToClipboard('#copyTitle')">Copy Title</button>
+                    </div>
+
+                    <div class="copy-section">
+                        <h3>Body</h3>
+                        <div class="copy-text" id="copyBody">${escapeHtml(blog.body)}</div>
+                        <button class="btn btn-sm btn-copy" onclick="copyToClipboard('#copyBody')">Copy Body</button>
+                    </div>
+                `;
+
+                document.getElementById('copyModalContent').innerHTML = content;
+                document.getElementById('copyModal').classList.add('active');
+            } catch (err) {
+                console.error('Error opening copy modal:', err);
+                showToast('Error loading blog content', 'error');
+            }
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(selector) {
+            const element = document.querySelector(selector);
+            const text = element.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!', 'success');
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                showToast('Failed to copy', 'error');
+            });
+        }
+
+        // Close copy modal
+        function closeCopyModal() {
+            document.getElementById('copyModal').classList.remove('active');
+        }
+
+        // Mark blog as posted
+        async function markPosted(blogId) {
+            try {
+                const response = await fetch(`${API_BASE}/blogs/${blogId}/mark-posted`, {
+                    method: 'PUT'
+                });
+
+                if (response.ok) {
+                    showToast('Blog marked as posted!', 'success');
+                    await loadBlogs();
+                    await refreshDashboard();
+                } else {
+                    showToast('Error marking blog as posted', 'error');
+                }
+            } catch (err) {
+                console.error('Error marking blog as posted:', err);
+                showToast('Error marking blog as posted', 'error');
+            }
+        }
+
+        // Generate blogs now
+        async function generateBlogsNow() {
+            if (!currentAccount) return;
+
+            const btn = document.getElementById('generateBtnText');
+            const originalText = btn.textContent;
+            btn.innerHTML = '<span class="loading"></span> Generating...';
+
+            try {
+                const response = await fetch(`${API_BASE}/blogs/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ account_id: currentAccount })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast(`✓ Generated ${data.generated_count} blogs!`, 'success');
+                    await loadBlogs();
+                    await refreshDashboard();
+                } else {
+                    showToast(`Error: ${data.error}`, 'error');
+                }
+            } catch (err) {
+                console.error('Error generating blogs:', err);
+                showToast('Error generating blogs', 'error');
+            } finally {
+                btn.textContent = originalText;
+            }
+        }
+
+        // Toggle generation history
+        async function toggleGenerationHistory() {
+            if (!currentAccount) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/generation-history/${currentAccount}`);
+                const data = await response.json();
+
+                const historyHtml = data.history.length === 0 
+                    ? '<p>No generation history yet</p>'
+                    : `<table style="width: 100%; border-collapse: collapse;">
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <th style="text-align: left; padding: 10px;">Date</th>
+                            <th style="text-align: left; padding: 10px;">Generated</th>
+                            <th style="text-align: left; padding: 10px;">Status</th>
+                        </tr>
+                        ${data.history.map(h => `
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 10px;">${new Date(h.created_at).toLocaleString()}</td>
+                                <td style="padding: 10px;">${h.generated_count} blogs</td>
+                                <td style="padding: 10px;">${h.error ? '❌ Error: ' + h.error : '✅ Success'}</td>
+                            </tr>
+                        `).join('')}
+                      </table>`;
+
+                document.getElementById('historyContent').innerHTML = historyHtml;
+                document.getElementById('historyModal').classList.add('active');
+            } catch (err) {
+                console.error('Error loading history:', err);
+                showToast('Error loading history', 'error');
+            }
+        }
+
+        // Close history modal
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('active');
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-refresh dashboard every 30 seconds
+        setInterval(() => {
+            if (currentAccount) {
+                refreshDashboard();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

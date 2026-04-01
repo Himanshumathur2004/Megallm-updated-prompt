@@ -11,6 +11,7 @@ import math
 import hashlib
 import logging
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple  # FIX 1: Added Tuple import (was using tuple[...] without import)
 from dataclasses import dataclass, field  # FIX 2: Added field import (needed for mutable default in dataclass)
 
@@ -34,13 +35,18 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Config:
     # MegaLLM API (OpenAI-compatible)
-    openai_api_key: str = os.getenv("MEGALLM_API_KEY", "")  # or OPENAI_API_KEY
+    openai_api_key: str = field(default_factory=lambda: os.getenv("MEGALLM_API_KEY", ""))  # or OPENAI_API_KEY
     openai_base_url: str = "https://ai.megallm.io/v1"
-    openai_model: str = "deepseek-ai/deepseek-v3.1"
+    openai_model: str = field(
+        default_factory=lambda: os.getenv(
+            "WF1_OPENAI_MODEL", os.getenv("OPENAI_MODEL", "deepseek-ai/deepseek-v3.1")
+        )
+    )
 
     # MongoDB
-    mongodb_uri: str = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
-    mongodb_db: str = os.getenv("MONGODB_DB", "megallm")
+    mongodb_uri: str = field(default_factory=lambda: os.getenv("MONGODB_URI", "mongodb://localhost:27017"))
+    mongodb_db: str = field(default_factory=lambda: os.getenv("MONGODB_DB", "megallm"))
+    scrape_run_id: str = field(default_factory=lambda: os.getenv("WF1_SCRAPE_RUN_ID", ""))
 
     # Qdrant
     qdrant_url: str = os.getenv("QDRANT_URL", "http://localhost:6333")
@@ -480,13 +486,21 @@ class ContentIntelligencePipeline:
         self.content_insights: Collection = self.db.content_insights
 
     def fetch_pending_articles(self) -> List[Dict]:
-        """Fetch pending articles from MongoDB."""
-        cursor = self.articles.find(
-            {"status": "pending"}
-        ).sort("llm_score", -1).limit(self.config.max_articles)
+        """Fetch pending articles from MongoDB, optionally scoped to a scrape run id."""
+        query: Dict[str, Any] = {"status": "pending"}
+        if self.config.scrape_run_id:
+            query["scrape_run_id"] = self.config.scrape_run_id
+
+        cursor = self.articles.find(query).sort("isoDate", -1).limit(self.config.max_articles)
 
         articles = list(cursor)
-        logger.info(f"Fetched {len(articles)} pending articles")
+        if self.config.scrape_run_id:
+            logger.info(
+                f"Fetched {len(articles)} pending articles for scrape_run_id={self.config.scrape_run_id} "
+                "(sorted by most recent)"
+            )
+        else:
+            logger.info(f"Fetched {len(articles)} pending articles (sorted by most recent)")
         return articles
 
     def check_duplicate(self, article: Dict) -> Tuple[bool, float]:  # FIX 6: Tuple (capital T) from typing, not built-in tuple[...]
@@ -703,8 +717,22 @@ def run_pipeline():
 
     config = Config()
 
-    # Support MEGALLM_API_KEY and OPENAI_API_KEY, with .env fallback.
-    api_key = resolve_api_key()
+    # Force read from .env to override any cached environ vars
+    api_key = None
+    env_path = Path('.env')
+    if env_path.exists():
+        for line in env_path.read_text(encoding='utf-8').splitlines():
+            if line.startswith('MEGALLM_API_KEY='):
+                api_key = line.split('=', 1)[1].strip().strip('"\'')
+                break
+            if line.startswith('OPENAI_API_KEY='):
+                api_key = line.split('=', 1)[1].strip().strip('"\'')
+                break
+    
+    if not api_key:
+        # Fallback to resolve_api_key if .env doesn't have it
+        api_key = resolve_api_key()
+    
     if not api_key:
         logger.error("MEGALLM_API_KEY or OPENAI_API_KEY not found")
         logger.error("Set one of the following and re-run:")
@@ -715,6 +743,7 @@ def run_pipeline():
         return
 
     config.openai_api_key = api_key
+    logger.info(f"Using API key from .env: {api_key[:20]}...")
 
     pipeline = ContentIntelligencePipeline(config)
     try:

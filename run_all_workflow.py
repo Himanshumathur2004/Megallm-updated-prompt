@@ -3,11 +3,13 @@
 
 import argparse
 import logging
+import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from bson import ObjectId
 
+import scrape_to_mongo
 import wf1
 import wf2
 import wf3
@@ -40,6 +42,16 @@ def _run_wf1() -> None:
     logger.info("[WF1] Starting content intelligence pipeline...")
     wf1.run_pipeline()
     logger.info("[WF1] Finished.")
+
+
+def _run_scrape() -> Dict[str, Any]:
+    logger.info("[SCRAPE] Fetching new articles from web feeds...")
+    summary = scrape_to_mongo.scrape_new_articles()
+    logger.info(
+        f"[SCRAPE] Inserted={summary.get('inserted', 0)} skipped={summary.get('skipped', 0)} "
+        f"run_id={summary.get('scrape_run_id', '')}"
+    )
+    return summary
 
 
 def _post_status_counts(collection, post_ids: List[str]) -> Dict[str, int]:
@@ -158,6 +170,11 @@ def main() -> None:
         description="Run WF1 -> WF2 -> WF3 in one command.",
     )
     parser.add_argument(
+        "--skip-scrape",
+        action="store_true",
+        help="Skip web scraping and use already-existing pending articles.",
+    )
+    parser.add_argument(
         "--skip-wf1",
         action="store_true",
         help="Skip WF1 and start from existing pending_generation insights.",
@@ -178,7 +195,18 @@ def main() -> None:
 
     bootstrap_env(__file__)
 
-    if not args.skip_wf1:
+    scrape_summary: Dict[str, Any] = {"inserted": 0, "scrape_run_id": ""}
+    if not args.skip_scrape:
+        scrape_summary = _run_scrape()
+
+    scrape_run_id = str(scrape_summary.get("scrape_run_id") or "")
+    if scrape_run_id:
+        os.environ["WF1_SCRAPE_RUN_ID"] = scrape_run_id
+
+    if not args.skip_wf1 and not args.skip_scrape and int(scrape_summary.get("inserted", 0)) == 0:
+        logger.info("[WF1] No newly scraped articles inserted. Skipping WF1.")
+
+    if not args.skip_wf1 and (args.skip_scrape or int(scrape_summary.get("inserted", 0)) > 0):
         _run_wf1()
 
     generated_by_insight = _run_wf2(limit=args.limit_insights)

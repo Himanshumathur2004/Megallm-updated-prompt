@@ -20,6 +20,8 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from bson import ObjectId
 from workflow_common import LLMQuotaExceededError, bootstrap_env, resolve_api_key
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -47,13 +49,17 @@ class InsightNotFoundError(Exception):
 @dataclass
 class WF2Config:
     # MegaLLM / OpenAI-compatible
-    api_key: str = ""
+    api_key: str = field(default_factory=lambda: os.getenv("MEGALLM_API_KEY", os.getenv("OPENAI_API_KEY", "sk-mega-6c309f77db9167850e784c25d8f8f93b672b2173b4dd791aa5c31a5ff6bd4329")))
     api_base_url: str = "https://ai.megallm.io/v1"
-    model: str = "deepseek-ai/deepseek-v3.1"
+    model: str = field(
+        default_factory=lambda: os.getenv(
+            "WF2_MODEL", os.getenv("OPENAI_MODEL", "deepseek-ai/deepseek-v3.1")
+        )
+    )
 
     # MongoDB
-    mongodb_uri: str = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
-    mongodb_db: str = os.getenv("MONGODB_DB", "megallm")
+    mongodb_uri: str = field(default_factory=lambda: os.getenv("MONGODB_URI", "mongodb://localhost:27017"))
+    mongodb_db: str = field(default_factory=lambda: os.getenv("MONGODB_DB", "megallm"))
 
     # Serper (SEO brief)
     serper_api_key: str = field(default_factory=lambda: os.getenv("SERPER_API_KEY", ""))
@@ -69,14 +75,14 @@ class WF2Config:
     linkedin_max_tokens: int = 600
     twitter_max_tokens: int = 800
     blog_max_tokens: int = 3000
-    newsletter_max_tokens: int = 600
+    newsletter_max_tokens: int = 1500
 
     linkedin_temp_a: float = 0.70
     linkedin_temp_b: float = 0.85
     twitter_temp_a: float = 0.75
     twitter_temp_b: float = 0.85
     blog_temp: float = 0.65
-    newsletter_temp: float = 0.70
+    newsletter_temp: float = 0.72
 
 
 # ---------------------------------------------------------------------------
@@ -110,7 +116,7 @@ class LLMClient:
             "max_tokens": max_tokens,
         }
         try:
-            resp = requests.post(url, headers=self._headers, json=payload, timeout=120)
+            resp = requests.post(url, headers=self._headers, json=payload, timeout=300)
             resp.raise_for_status()
             return resp.json()["choices"][0]["message"]["content"]
         except requests.exceptions.HTTPError as exc:
@@ -276,30 +282,28 @@ Style and trust requirements:
 
 Output the full blog post as plain markdown text (no JSON wrapper)."""
 
-NEWSLETTER_SYSTEM = """You are writing a B2B newsletter digest for MegaLLM.
+NEWSLETTER_SYSTEM = """You are writing a comprehensive, engaging B2B newsletter digest for MegaLLM.
 
-Audience: CTOs at AI startups in UK, Singapore, Australia, New Zealand.
+Audience: CTOs at AI startups in UK, Singapore, Australia, New Zealand. Technical, data-driven decision makers.
 
-Format rules (strict 3-item structure):
-1. Hook Insight — the key takeaway from this week's article (2–3 sentences).
-2. Infra Takeaway — one concrete infrastructure implication or data point.
-3. MegaLLM Angle — how MegaLLM addresses this (2–3 sentences).
-End with a single CTA sentence.
-Total: 300–400 words. Plain text, no markdown.
+Format rules (detailed 5-part structure):
+1. Hook Insight — the compelling key takeaway from this week's article (3–4 sentences, build tension/context).
+2. Why This Matters — specific business implications for AI startup infrastructure and operations (3–4 sentences with at least one concrete scenario).
+3. Infra Takeaway — quantified infrastructure data points, benchmarks, or architecture implications (4–5 sentences, include specific numbers, percentages, latency impacts, cost examples when possible).
+4. Interactive Element — one thought-provoking question, a brief comparison table concept, or a decision framework snippet that encourages action (2–3 sentences).
+5. MegaLLM Angle — how MegaLLM specifically addresses this challenge (4–5 sentences, map to concrete value: cost reduction %, speed improvement, uptime guarantee, feature parity, or compliance enablement).
+End with a compelling but soft CTA sentence (benchmark comparison, 30-min pilot offer, or migration readiness check).
+Total: 650–850 words. Plain text, no markdown. Conversational yet technical tone.
 
 Additional quality rules:
-- Keep language concise, technical, and decision-focused for startup CTOs.
-- Prioritize one clear implication over broad summaries.
-- Include at least one explicit number and context in Infra Takeaway when possible.
-- Ensure MegaLLM Angle maps to one primary value proposition (cost, speed, reliability, flexibility, or compliance).
-- Avoid generic lines such as "this matters" without a concrete reason.
-- Keep CTA soft and practical (benchmark, pilot, or migration step).
-
-Additional editorial requirements:
-- Keep each of the 3 items distinct and non-overlapping.
-- Make Infra Takeaway directly useful for a weekly planning or architecture review.
-- Ensure the CTA suggests a low-friction next step.
-- Maintain plain text formatting with clear section labels or sequencing language."""
+- Keep language engaging, technical, and action-oriented for forward-thinking CTOs.
+- Use concrete examples: "reduces latency by 40ms per inference" instead of "improves performance."
+- Include at least two explicit numbers or metrics in the Infra Takeaway section.
+- Ensure every section drives toward a specific business outcome (cost, speed, reliability, flexibility, or compliance).
+- Avoid filler phrases; every sentence should have information density.
+- Create natural transitions between sections; this should read like a narrative, not a checklist.
+- Interactive Element should feel relevant and not forced (e.g., "Quick self-assess: Is your team managing N GPUs across M clusters?" suggests a pain point they might relate to).
+- CTA should offer a clear, low-friction next step (whitepaper download, architecture review, or live demo with specific use case)."""
 
 
 def _parse_json_response(raw: str, fallback_key: str = "content") -> Any:
@@ -486,6 +490,12 @@ def build_insert_payloads(
     now = datetime.now(timezone.utc).isoformat()
     rows: List[Dict[str, Any]] = []
 
+    # Keep both string and ObjectId forms so downstream queries can match either schema.
+    try:
+        content_insight_id: Any = ObjectId(insight_id)
+    except Exception:
+        content_insight_id = insight_id
+
     # -- LinkedIn --
     linkedin = results.get("linkedin")
     if linkedin and isinstance(linkedin, tuple) and len(linkedin) == 2:
@@ -494,6 +504,7 @@ def build_insert_payloads(
             rows.append(
                 {
                     "insight_id": insight_id,
+                    "content_insight_id": content_insight_id,
                     "platform": "linkedin",
                     "variant": variant,
                     "content": text,
@@ -511,6 +522,7 @@ def build_insert_payloads(
             rows.append(
                 {
                     "insight_id": insight_id,
+                    "content_insight_id": content_insight_id,
                     "platform": "twitter",
                     "variant": variant,
                     "content": json.dumps(tweets),   # store as JSON string
@@ -526,6 +538,7 @@ def build_insert_payloads(
         rows.append(
             {
                 "insight_id": insight_id,
+                "content_insight_id": content_insight_id,
                 "platform": "blog",
                 "variant": "A",          # single variant for blog
                 "content": blog,
@@ -538,6 +551,7 @@ def build_insert_payloads(
         rows.append(
             {
                 "insight_id": insight_id,
+                "content_insight_id": content_insight_id,
                 "platform": "blog_seo_meta",
                 "variant": "A",
                 "content": "",
@@ -558,6 +572,7 @@ def build_insert_payloads(
         rows.append(
             {
                 "insight_id": insight_id,
+                "content_insight_id": content_insight_id,
                 "platform": "newsletter",
                 "variant": "A",
                 "content": newsletter,

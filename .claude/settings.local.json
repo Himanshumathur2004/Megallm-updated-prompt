@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls e:prompt_megallm*.py)",
+      "Read(//mnt/e/**)",
+      "Bash(ls *.py)"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+# Render.com - Deployment Configuration
+
+web:
+  # Web service configuration
+  name: megallm-blog-platform
+  runtime: python39
+  buildCommand: pip install -r requirements.txt
+  startCommand: "cd blog_platform && gunicorn wsgi:app --bind 0.0.0.0:$PORT"
+  envVars:
+    - key: MONGODB_URI
+      scope: runtime
+      value: mongodb+srv://himanshu123:himanshu123@cluster0.ecqcp1z.mongodb.net/?appName=Cluster0
+    - key: MONGODB_DB
+      value: megallm_blog_platform
+    - key: OPENROUTER_API_KEY
+      scope: runtime
+      value: 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
+    - key: USE_OPENROUTER
+      value: "true"
+    - key: OPENROUTER_MODEL
+      value: qwen/qwen3.6-plus-preview:free
+    - key: FLASK_ENV
+      value: production

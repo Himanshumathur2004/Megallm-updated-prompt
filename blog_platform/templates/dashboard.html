@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MegaLLM Blog Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary) !important;
+            font-size: 1.5rem;
+        }
+        
+        .container-main {
+            max-width: 1400px;
+            margin: 20px auto;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-card h6 {
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px 12px 0 0;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            padding: 10px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5558e3 0%, #7c3aed 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .blog-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .blog-item:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .blog-item h6 {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .blog-item .meta {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .badge-account {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+            font-weight: 500;
+        }
+        
+        .tab-content {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            padding: 20px;
+        }
+        
+        .nav-tabs .nav-link {
+            color: #6b7280;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: transparent;
+        }
+        
+        .insight-badge {
+            background: #f3f4f6;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px 0;
+            border-left: 3px solid var(--secondary);
+        }
+        
+        .insight-badge strong {
+            color: var(--secondary);
+        }
+        
+        .account-selector {
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        
+        .checkbox-label input {
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .stat-card .number {
+                font-size: 1.5rem;
+            }
+            
+            .container-main {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-lightning-charge"></i> MegaLLM Blog Platform
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link" id="status-indicator">
+                            <span class="badge bg-success">✓ Connected</span>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-main">
+        <!-- Status Alert -->
+        <div id="alert-container"></div>
+
+        <!-- Dashboard Header -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h6>Total Blogs</h6>
+                    <div class="number" id="total-blogs">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: #10b981;">
+                    <h6>Total Insights</h6>
+                    <div class="number" id="total-insights">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: #f59e0b;">
+                    <h6>Total Articles</h6>
+                    <div class="number" id="total-articles">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: #06b6d4;">
+                    <h6>Active Accounts</h6>
+                    <div class="number" id="total-accounts">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" role="tablist" style="background: white; border-radius: 12px 12px 0 0; padding: 0 20px; border: none;">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">
+                    <i class="bi bi-graph-up"></i> Dashboard
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="generate-tab" data-bs-toggle="tab" data-bs-target="#generate" type="button" role="tab">
+                    <i class="bi bi-pencil-square"></i> Generate Blogs
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="blogs-tab" data-bs-toggle="tab" data-bs-target="#blogs" type="button" role="tab">
+                    <i class="bi bi-file-earmark-text"></i> View Blogs
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="insights-tab" data-bs-toggle="tab" data-bs-target="#insights" type="button" role="tab">
+                    <i class="bi bi-lightbulb"></i> Insights
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="accounts-tab" data-bs-toggle="tab" data-bs-target="#accounts" type="button" role="tab">
+                    <i class="bi bi-people"></i> Accounts
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Dashboard Tab -->
+            <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h5 class="mb-3">Recent Blogs</h5>
+                        <div id="recent-blogs"></div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h5 class="mb-3">Blogs by Account</h5>
+                        <div id="account-stats"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Tab -->
+            <div class="tab-pane fade" id="generate" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h5 class="mb-4">Generate Blogs from Insights</h5>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="mb-3">Select Accounts:</h6>
+                                <div class="account-selector" id="account-selector">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="account-check" value="account_1" checked>
+                                        <span>Account 1</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="account-check" value="account_2" checked>
+                                        <span>Account 2</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="account-check" value="account_3" checked>
+                                        <span>Account 3</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="account-check" value="account_4" checked>
+                                        <span>Account 4</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="account-check" value="account_5" checked>
+                                        <span>Account 5</span>
+                                    </label>
+                                </div>
+
+                                <hr>
+
+                                <div class="mb-3">
+                                    <label for="insight-count" class="form-label">Number of Insights to Use:</label>
+                                    <input type="number" class="form-control" id="insight-count" value="5" min="1" max="36">
+                                    <small class="text-muted">Available: 36 insights</small>
+                                </div>
+
+                                <button class="btn btn-primary btn-lg w-100" id="generate-btn">
+                                    <i class="bi bi-rocket"></i> Generate Blogs
+                                </button>
+
+                                <div class="loading-spinner" id="generate-spinner">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Generating...</span>
+                                    </div>
+                                    <p class="mt-2">Generating blogs... This may take a few minutes.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="generate-result" class="mt-3"></div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card" style="background: #f0f9ff; border-left: 4px solid #0284c7;">
+                            <div class="card-body">
+                                <h6 class="mb-3"><i class="bi bi-info-circle"></i> How It Works</h6>
+                                <p><strong>Step 1:</strong> Select which accounts to generate blogs for</p>
+                                <p><strong>Step 2:</strong> Choose how many insights to use</p>
+                                <p><strong>Step 3:</strong> Click "Generate Blogs"</p>
+                                <p class="mb-0"><strong>Step 4:</strong> Wait for generation to complete (1-2 min)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blogs Tab -->
+            <div class="tab-pane fade" id="blogs" role="tabpanel">
+                <h5 class="mb-3">All Generated Blogs</h5>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="blog-search" placeholder="Search blogs by title...">
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" id="blog-account-filter">
+                            <option value="">All Accounts</option>
+                            <option value="account_1">Account 1</option>
+                            <option value="account_2">Account 2</option>
+                            <option value="account_3">Account 3</option>
+                            <option value="account_4">Account 4</option>
+                            <option value="account_5">Account 5</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="blogs-list"></div>
+            </div>
+
+            <!-- Insights Tab -->
+            <div class="tab-pane fade" id="insights" role="tabpanel">
+                <h5 class="mb-3">Available Insights</h5>
+                <div id="insights-list"></div>
+            </div>
+
+            <!-- Accounts Tab -->
+            <div class="tab-pane fade" id="accounts" role="tabpanel">
+                <h5 class="mb-3">Account Dashboard</h5>
+                <div class="row" id="accounts-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = window.location.origin + '/api';
+
+        // Fetch and display stats
+        async function loadStats() {
+            try {
+                const blogsRes = await fetch(`${API_BASE}/blogs`);
+                const blogsData = await blogsRes.json();
+                const totalBlogs = Array.isArray(blogsData) ? blogsData.length : 0;
+                document.getElementById('total-blogs').textContent = totalBlogs;
+
+                const insightsRes = await fetch(`${API_BASE}/insights`);
+                const insightsData = await insightsRes.json();
+                const totalInsights = Array.isArray(insightsData) ? insightsData.length : 0;
+                document.getElementById('total-insights').textContent = totalInsights;
+
+                const articlesRes = await fetch(`${API_BASE}/articles`);
+                const articlesData = await articlesRes.json();
+                const totalArticles = Array.isArray(articlesData) ? articlesData.length : 0;
+                document.getElementById('total-articles').textContent = totalArticles;
+
+                document.getElementById('total-accounts').textContent = '5';
+
+                await loadRecentBlogs(blogsData);
+                await loadAccountStats(blogsData);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                showAlert('Error loading dashboard data', 'danger');
+            }
+        }
+
+        // Load recent blogs
+        async function loadRecentBlogs(blogs) {
+            const container = document.getElementById('recent-blogs');
+            container.innerHTML = '';
+            
+            const recentBlogs = (Array.isArray(blogs) ? blogs : [])
+                .slice(0, 5)
+                .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+            if (recentBlogs.length === 0) {
+                container.innerHTML = '<p class="text-muted">No blogs generated yet</p>';
+                return;
+            }
+
+            recentBlogs.forEach(blog => {
+                const date = new Date(blog.created_at).toLocaleDateString();
+                container.innerHTML += `
+                    <div class="blog-item">
+                        <h6>${blog.title || 'Untitled'}</h6>
+                        <div class="meta">
+                            <span class="badge-account">${blog.account_id || 'N/A'}</span>
+                            <span class="ms-2">${date}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Load account statistics
+        async function loadAccountStats(blogs) {
+            const container = document.getElementById('account-stats');
+            const stats = {};
+            
+            (Array.isArray(blogs) ? blogs : []).forEach(blog => {
+                const account = blog.account_id || 'unknown';
+                stats[account] = (stats[account] || 0) + 1;
+            });
+
+            container.innerHTML = Object.entries(stats)
+                .sort((a, b) => b[1] - a[1])
+                .map(([account, count]) => `
+                    <div class="insight-badge">
+                        <strong>${account}</strong>: <span class="float-end">${count} blogs</span>
+                    </div>
+                `).join('');
+
+            if (Object.keys(stats).length === 0) {
+                container.innerHTML = '<p class="text-muted">No blog data</p>';
+            }
+        }
+
+        // Generate blogs
+        document.getElementById('generate-btn').addEventListener('click', async () => {
+            const selectedAccounts = Array.from(document.querySelectorAll('.account-check:checked'))
+                .map(cb => cb.value);
+            
+            if (selectedAccounts.length === 0) {
+                showAlert('Please select at least one account', 'warning');
+                return;
+            }
+
+            showGenerating(true);
+            try {
+                const response = await fetch(`${API_BASE}/insights/generate-blogs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ accounts: selectedAccounts })
+                });
+
+                const result = await response.json();
+                showGenerating(false);
+
+                if (response.ok) {
+                    showAlert(`✓ Generated ${result.total_blogs || 0} blogs!`, 'success');
+                    await new Promise(r => setTimeout(r, 1500));
+                    await loadStats();
+                } else {
+                    showAlert(result.error || 'Generation failed', 'danger');
+                }
+            } catch (error) {
+                showGenerating(false);
+                console.error('Error:', error);
+                showAlert('Error generating blogs', 'danger');
+            }
+        });
+
+        // Load all blogs
+        document.getElementById('blogs-tab').addEventListener('click', loadAllBlogs);
+        async function loadAllBlogs() {
+            try {
+                const res = await fetch(`${API_BASE}/blogs`);
+                const blogs = await res.json();
+                const container = document.getElementById('blogs-list');
+                
+                if (!Array.isArray(blogs) || blogs.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No blogs found</p>';
+                    return;
+                }
+
+                container.innerHTML = blogs
+                    .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+                    .map(blog => `
+                        <div class="blog-item">
+                            <h6>${blog.title || 'Untitled'}</h6>
+                            <p class="text-muted mb-2" style="font-size: 0.9rem;">${blog.body ? blog.body.substring(0, 100) + '...' : 'No content'}</p>
+                            <div class="meta">
+                                <span class="badge-account">${blog.account_id || 'N/A'}</span>
+                                <span class="ms-2"><strong>Status:</strong> ${blog.status || 'draft'}</span>
+                                <span class="ms-2"><strong>Date:</strong> ${new Date(blog.created_at || Date.now()).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    `).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error loading blogs', 'danger');
+            }
+        }
+
+        // Load insights
+        document.getElementById('insights-tab').addEventListener('click', loadInsights);
+        async function loadInsights() {
+            try {
+                const res = await fetch(`${API_BASE}/insights`);
+                const insights = await res.json();
+                const container = document.getElementById('insights-list');
+                
+                if (!Array.isArray(insights) || insights.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No insights found</p>';
+                    return;
+                }
+
+                container.innerHTML = insights
+                    .slice(0, 20)
+                    .map(insight => `
+                        <div class="insight-badge">
+                            <div><strong>Hook:</strong> ${insight.hook_sentence || 'N/A'}</div>
+                            <div class="mt-2"><strong>Claim:</strong> ${insight.core_claim || 'N/A'}</div>
+                            <div class="mt-2"><strong>Data:</strong> ${insight.infra_data_point || 'N/A'}</div>
+                            <div class="mt-2"><small class="text-muted"><strong>Status:</strong> ${insight.status || 'pending'}</small></div>
+                        </div>
+                    `).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error loading insights', 'danger');
+            }
+        }
+
+        // Load accounts
+        document.getElementById('accounts-tab').addEventListener('click', loadAccounts);
+        async function loadAccounts() {
+            try {
+                const res = await fetch(`${API_BASE}/accounts`);
+                const accounts = await res.json();
+                const container = document.getElementById('accounts-list');
+                
+                if (!Array.isArray(accounts) || accounts.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No accounts found</p>';
+                    return;
+                }
+
+                container.innerHTML = accounts
+                    .map(account => `
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>${account.name || account._id}</h6>
+                                    <p class="text-muted mb-0">Email: ${account.email || 'N/A'}</p>
+                                    <p class="text-muted mb-0">Blogs: ${account.blog_count || 0}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error loading accounts', 'danger');
+            }
+        }
+
+        // Helper functions
+        function showAlert(message, type = 'info') {
+            const alert = `
+                <div class="alert alert-${type} alert-custom alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.getElementById('alert-container').innerHTML = alert;
+        }
+
+        function showGenerating(show) {
+            document.getElementById('generate-spinner').style.display = show ? 'block' : 'none';
+            document.getElementById('generate-btn').disabled = show;
+        }
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', loadStats);
+        setInterval(loadStats, 30000); // Refresh every 30 seconds
+    </script>
+</body>
+</html>

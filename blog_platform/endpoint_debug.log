@@ -1,0 +1,1064 @@
+
+=== ENDPOINT CALLED at 2026-04-01T13:31:01.271812 ===
+account_id: account_1
+topics_to_generate: {'cost_optimization': 1}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 1 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T13:33:31.990268 ===
+account_id: account_1
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T13:33:32.048874 ===
+account_id: account_2
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T13:33:32.096125 ===
+account_id: account_3
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T13:33:32.136848 ===
+account_id: account_4
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T13:33:32.186199 ===
+account_id: account_5
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T13:33:49.615860 ===
+account_id: account_1
+topics_to_generate: {'cost_optimization': 1, 'security': 1}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 1 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T13:34:08.904169 ===
+account_id: account_1
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T15:32:14.124086 ===
+account_id: account_1
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T15:32:14.155087 ===
+account_id: account_2
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T15:32:14.179844 ===
+account_id: account_3
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T15:32:14.204832 ===
+account_id: account_4
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T15:32:14.229469 ===
+account_id: account_5
+topics_to_generate: {'cost_optimization': 2, 'infrastructure': 2, 'performance': 2, 'reliability': 2}
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 8 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:14:35.511761 ===
+account_id: account_1
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:14:37.885532 ===
+account_id: account_2
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:14:40.030154 ===
+account_id: account_3
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:14:42.131556 ===
+account_id: account_4
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:14:44.238432 ===
+account_id: account_5
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:25:25.908812 ===
+account_id: account_1
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:25:35.575611 ===
+account_id: account_1
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:25:37.690724 ===
+account_id: account_2
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:25:39.885976 ===
+account_id: account_3
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:25:42.017257 ===
+account_id: account_4
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:25:44.148235 ===
+account_id: account_5
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:27:13.014343 ===
+account_id: account_2
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:31:43.286007 ===
+account_id: account_1
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:31:45.499648 ===
+account_id: account_2
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:31:47.667336 ===
+account_id: account_3
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:31:49.991697 ===
+account_id: account_4
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:31:53.335946 ===
+account_id: account_5
+topics_to_generate: None
+blog_generator type: <class 'mock_blog_generator.MockBlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:44:09.856248 ===
+account_id: account_1
+topics_to_generate: None
+blog_generator type: <class 'blog_generator.BlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+  Processing topic: performance
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+  Processing topic: reliability
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+  Processing topic: infrastructure
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+Generated 0 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:44:31.380039 ===
+account_id: account_1
+topics_to_generate: None
+blog_generator type: <class 'blog_generator.BlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+  Processing topic: performance
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+  Processing topic: reliability
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+  Processing topic: infrastructure
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+Generated 0 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T16:52:15.003061 ===
+account_id: account_1
+topics_to_generate: None
+blog_generator type: <class 'blog_generator.BlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+  Processing topic: performance
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+  Processing topic: reliability
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+  Processing topic: infrastructure
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+      generate_blog() returned OK: False
+Generated 0 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T17:08:49.567909 ===
+account_id: account_1
+topics_to_generate: {'cost_optimization': 1, 'infrastructure': 1}
+blog_generator type: <class 'blog_generator.BlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+
+=== ENDPOINT CALLED at 2026-04-01T17:12:05.093517 ===
+account_id: account_1
+topics_to_generate: None
+blog_generator type: <class 'blog_generator.BlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 2 blogs, error: None
+=== END ENDPOINT ===
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-01T22:41:11.860552 ===
+account_id: account_1
+topics_to_generate: None
+blog_generator type: <class 'blog_generator.BlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 12 blogs, error: None
+=== END ENDPOINT ===

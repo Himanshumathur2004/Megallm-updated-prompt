@@ -1,0 +1,417 @@
+# ARCHITECTURE DIAGRAM: Integrated Pipeline
+
+## System Overview
+
+```
+╔════════════════════════════════════════════════════════════════════════════╗
+║            COMPLETE CONTENT GENERATION PIPELINE (INTEGRATED)               ║
+║                   Scrape → Analyze → Generate (5 Accounts)                ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+INPUT SOURCES
+═════════════
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          THREE RSS FEEDS                                 │
+├─────────────────────────────────────────────────────────────────────────┤
+│  🔗 TechCrunch     🔗 Medium         🔗 HackerNews                       │
+│  Tech news          Tech blogs        Tech discussions                   │
+└─────────────────────────────────────────────────────────────────────────┘
+         │                  │                    │
+         └──────────────────┼────────────────────┘
+                            ▼
+                    ┌─────────────────┐
+                    │ scrape_to_mongo │
+                    │    (Extract)    │
+                    └─────────────────┘
+                            │
+                            ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│ MongoDB: articles (RAW CONTENT)                                           │
+├───────────────────────────────────────────────────────────────────────────┤
+│  Fields: title, link, description, source, pub_date, guid                │
+│  Status: Ready for WF1 analysis                                           │
+│  Count:  ~100-200 articles per run                                        │
+└───────────────────────────────────────────────────────────────────────────┘
+
+
+STEP 1: SCRAPING
+════════════════
+orchestrate_full_pipeline.py::step_1_scrape_articles()
+  │
+  ├─ Fetch from 3 RSS feeds
+  ├─ Parse XML → extract article metadata
+  ├─ Check MongoDB for duplicates (by guid)
+  ├─ Insert new articles
+  │
+  ▼
+✓ Output: articles collection (MongoDB)
+  Total docs: ~100-200 per run
+  Status: Ready for WF1
+
+
+STEP 2: CONTENT INTELLIGENCE (WF1)
+═══════════════════════════════════
+orchestrate_full_pipeline.py::step_2_create_insights()
+  │
+  ├─ Load wf1.py ContentIntelligencePipeline
+  ├─ Read pending articles (status != analyzed)
+  ├─ For each article:
+  │  ├─ Call MegaLLM API with DeepSeek V3.1
+  │  ├─ Extract marketing angles:
+  │  │  ├─ hook_sentence (compelling opening)
+  │  │  ├─ core_claim (main takeaway)
+  │  │  ├─ megallm_tie_in (relevance to product)
+  │  │  ├─ infra_data_point (technical detail)
+  │  │  └─ angle_type (category classification)
+  │  │
+  │  └─ Insert into content_insights
+  │
+  ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│ MongoDB: content_insights (WF1 OUTPUT)                                   │
+├───────────────────────────────────────────────────────────────────────────┤
+│  {                                                                         │
+│    "_id": ObjectId,                                                       │
+│    "article_url": "https://....",                                        │
+│    "hook_sentence": "Latest AI model achieves 90% speedup",             │
+│    "core_claim": "New optimization technique saves 40% compute",        │
+│    "megallm_tie_in": "Relevant to cost optimization",                   │
+│    "infra_data_point": "Token efficiency, inference cost",              │
+│    "angle_type": "performance",  /* or: outage, pricing, etc */         │
+│    "value_prop": "CTO reduces infrastructure costs",                     │
+│    "status": "pending_generation",  /* ready for blog generation */     │
+│    "icp_score": 8.5,                                                     │
+│    "created_at": "2024-01-15T10:30:00Z"                                │
+│  }                                                                        │
+│                                                                           │
+│  Status: Awaiting blog generation                                        │
+│  Count:  10-20 insights per run (depends on articles)                   │
+└───────────────────────────────────────────────────────────────────────────┘
+
+
+STEP 3: BLOG GENERATION (5 ACCOUNT DISTRIBUTION)
+═════════════════════════════════════════════════
+orchestrate_full_pipeline.py::step_3_generate_blogs_for_accounts()
+       └─> InsightDrivenBlogScheduler (blog_platform/insight_scheduler.py)
+           │
+           ├─ Connect to MongoDB
+           ├─ Fetch pending insights (status='pending_generation')
+           │
+           ├─ For each insight:
+           │  │
+           │  ├─ For account_1:
+           │  │  ├─ Extract: hook_sentence, core_claim, infra_data_point
+           │  │  ├─ Call OpenRouter API (FREE Qwen model)
+           │  │  │  ├─ Model: qwen/qwen3.6-plus-preview:free
+           │  │  │  ├─ API: https://openrouter.ai/api/v1
+           │  │  │  └─ Response: {title, body}
+           │  │  ├─ Add metadata: account_id, topic, status, created_at
+           │  │  ├─ Insert to blogs collection
+           │  │  └─ Return: blog_id
+           │  │
+           │  ├─ For account_2: [same process]
+           │  ├─ For account_3: [same process]
+           │  ├─ For account_4: [same process]
+           │  └─ For account_5: [same process]
+           │
+           ├─ Mark insight status: 'pending_generation' → 'blogs_generated'
+           │
+           └─ Log summary
+
+Example: 15 insights → 15 × 5 = 75 blogs generated
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ MongoDB: blogs (FINAL OUTPUT)                                             │
+├───────────────────────────────────────────────────────────────────────────┤
+│  {                                                                         │
+│    "_id": ObjectId("..."),                                               │
+│    "title": "How We Cut Inference Costs by 40%",                         │
+│    "body": "Long-form blog content (600-900 words)...",                 │
+│    "account_id": "account_1",  /* Distributed to 1 of 5 accounts */     │
+│    "topic": "Cost Optimization",                                         │
+│    "insight_id": "ObjectId(...)",  /* Links back to source insight */   │
+│    "status": "draft",                                                    │
+│    "views": 0,                                                           │
+│    "created_at": "2024-01-15T11:45:00Z",                               │
+│    "hook": "Latest AI model achieves 90% speedup",                      │
+│    "core_claim": "New optimization technique saves 40% compute"         │
+│  }                                                                        │
+│                                                                           │
+│  Schema:                                                                 │
+│  - One doc per (insight × account)                                      │
+│  - Indexed by: account_id (for tenant isolation)                        │
+│  - Indexed by: insight_id (for tracking source)                         │
+│  - Status: draft (ready for dashboard)                                  │
+│                                                                           │
+│  Example distribution:                                                   │
+│  ├─ account_1: 15 blogs (one per insight)                              │
+│  ├─ account_2: 15 blogs (one per insight)                              │
+│  ├─ account_3: 15 blogs (one per insight)                              │
+│  ├─ account_4: 15 blogs (one per insight)                              │
+│  └─ account_5: 15 blogs (one per insight)                              │
+│  ═════════════════════════════════════════                             │
+│     Total: 75 blogs from 15 insights                                     │
+└───────────────────────────────────────────────────────────────────────────┘
+
+
+ORCHESTRATION FLOW
+══════════════════
+
+orchestrate_full_pipeline.py (MAIN ENTRY POINT)
+│
+├─ run_complete_pipeline()
+│  ├─ log_header("STEP 1: SCRAPE ARTICLES")
+│  ├─ step_1_scrape_articles()
+│  │  └─ scrape_to_mongo.scrape_new_articles() ◄─── RSS FEEDS
+│  │     └─ Output: articles collection
+│  │
+│  ├─ log_header("STEP 2: CREATE INSIGHTS (WF1)")
+│  ├─ step_2_create_insights()
+│  │  └─ wf1.ContentIntelligencePipeline.run()
+│  │     ├─ Input: articles ◄─── FROM STEP 1
+│  │     └─ Output: content_insights collection
+│  │
+│  ├─ log_header("STEP 3: GENERATE BLOGS FOR 5 ACCOUNTS")
+│  ├─ step_3_generate_blogs_for_accounts()
+│  │  └─ InsightDrivenBlogScheduler.generate_blogs_for_all_accounts()
+│  │     ├─ Input: content_insights ◄─── FROM STEP 2
+│  │     └─ Output: blogs collection
+│  │
+│  └─ print_summary()
+│
+└─ Log: orchestration.log
+
+
+API ENDPOINT
+════════════
+
+blog_platform/app.py
+─────────────────────
+
+NEW: POST /api/insights/generate-blogs (ADDED)
+  │
+  ├─ Validates blog_generator initialized
+  ├─ Calls: generate_blogs_from_insights_now()
+  │  └─ Creates: InsightDrivenBlogScheduler
+  │     └─ Runs: generate_blogs_for_all_accounts()
+  │
+  ├─ Response:
+  │  ├─ success: boolean
+  │  ├─ total_blogs: integer
+  │  ├─ insights_processed: integer
+  │  └─ accounts: {account_id -> {blogs_generated: count}}
+  │
+  └─ Status Code: 200 if success, 500 if error
+
+Usage:
+  curl -X POST http://localhost:5000/api/insights/generate-blogs
+
+Existing endpoints (unchanged):
+  GET  /api/blogs?account_id=X                    ◄─ Read blogs
+  GET  /api/dashboard/<account_id>                ◄─ Account summary
+  POST /api/blogs/generate                        ◄─ OLD: Random generation
+  GET  /api/accounts                              ◄─ List accounts
+
+
+FLASK API SERVER
+════════════════
+
+blog_platform/app.py (Flask Application)
+  │
+  ├─ Initialization:
+  │  ├─ Load config from config.py
+  │  ├─ Initialize MongoDB (database.py)
+  │  ├─ Initialize LLM (blog_generator.py)
+  │  └─ Initialize accounts
+  │
+  ├─ Middleware:
+  │  ├─ CORS enabled
+  │  ├─ validate_account decorator
+  │  └─ Error handlers (404, 500)
+  │
+  ├─ Routes:
+  │  ├─ GET  /                              ◄─ Dashboard HTML
+  │  ├─ GET  /api/accounts                  ◄─ List accounts
+  │  ├─ GET  /api/accounts/<id>             ◄─ Account details
+  │  ├─ GET  /api/blogs                     ◄─ List blogs (filtered)
+  │  ├─ GET  /api/blogs/<id>                ◄─ Blog details
+  │  ├─ POST /api/blogs/generate            ◄─ Generate random blogs
+  │  ├─ POST /api/insights/generate-blogs   ◄─ NEW: Generate from insights
+  │  ├─ GET  /api/dashboard/<id>            ◄─ Account stats
+  │  ├─ GET  /api/generation-history/<id>   ◄─ Previous generations
+  │  ├─ PUT  /api/blogs/<id>/mark-posted    ◄─ Mark as posted
+  │  ├─ GET  /api/blogs/<id>/copy           ◄─ Copy content
+  │  ├─ DELETE /api/blogs/<id>              ◄─ Delete blog
+  │  └─ GET  /api/health                    ◄─ Health check
+  │
+  └─ Runs on: http://localhost:5000
+
+
+CORE COMPONENTS
+═══════════════
+
+1. orchestrate_full_pipeline.py (MAIN ORCHESTRATION)
+   ├─ step_1_scrape_articles()         ◄─ Calls scrape_to_mongo
+   ├─ step_2_create_insights()         ◄─ Calls wf1
+   ├─ step_3_generate_blogs_for_accounts()  ◄─ Calls insight_scheduler
+   ├─ print_summary()                  ◄─ Logs complete results
+   └─ Runs sequentially with error handling
+
+2. blog_platform/insight_scheduler.py (NEW - BLOG GENERATION ENGINE)
+   ├─ class InsightDrivenBlogScheduler
+   │  ├─ connect_mongo()                ◄─ Connect to MongoDB
+   │  ├─ get_pending_insights()         ◄─ Fetch insights from DB
+   │  ├─ generate_blogs_from_insight()  ◄─ Single insight → 5 accounts
+   │  └─ generate_blogs_for_all_accounts() ◄─ All insights → All accounts
+   └─ generate_blogs_from_insights_now() ◄─ Quick function for API
+
+3. scrape_to_mongo.py (EXISTING - UNCHANGED)
+   ├─ scrape_new_articles()            ◄─ Scrapes RSS feeds
+   └─ Returns: {inserted, skipped}
+
+4. wf1.py (EXISTING - UNCHANGED)
+   ├─ ContentIntelligencePipeline
+   │  └─ run()                          ◄─ Analyzes articles
+   └─ Returns: {insights_created, errors}
+
+5. blog_platform/blog_generator.py (EXISTING - UNCHANGED)
+   ├─ class BlogGenerator
+   │  ├─ generate_blog()                ◄─ Single blog via API
+   │  └─ batch_generate()               ◄─ Multiple blogs
+   └─ Uses: OpenRouter API
+
+
+CONFIGURATION
+═════════════
+
+config.py (STATIC CONFIGURATION)
+├─ MONGODB_URI = "mongodb://localhost:27017"
+├─ MONGODB_DB = "megallm"
+│
+├─ USE_OPENROUTER = True
+├─ MEGALLM_API_KEY = from .env
+├─ MEGALLM_BASE_URL = "https://openrouter.ai/api/v1"
+├─ MEGALLM_MODEL = "qwen/qwen3.6-plus-preview:free"
+│
+├─ ACCOUNTS = [
+│  {id: "account_1", name: "Account 1", ...},
+│  {id: "account_2", name: "Account 2", ...},
+│  ...
+│  {id: "account_5", name: "Account 5", ...}
+│ ]
+│
+└─ TOPICS = {
+   "cost_optimization": {...},
+   "performance": {...},
+   "reliability": {...},
+   "infrastructure": {...}
+  }
+
+.env (SECRETS - NOT IN GIT)
+├─ MONGODB_URI=mongodb://localhost:27017
+├─ MONGODB_DB=megallm
+├─ OPENROUTER_API_KEY=sk-or-v1-...
+├─ OPENROUTER_MODEL=qwen/qwen3.6-plus-preview:free
+├─ MEGALLM_API_KEY=sk-mega-...
+└─ FLASK_ENV=development
+
+
+EXECUTION TIMELINE
+══════════════════
+
+Example: 15 insights → 75 blogs (15 × 5 accounts)
+
+Timeline:
+├─ 0:00-2:00   Step 1: SCRAPE ARTICLES
+│  └─ 3 RSS feeds → 100-200 articles
+│
+├─ 2:00-15:00  Step 2: WF1 INSIGHTS
+│  └─ 15 insights × ~45-50 seconds each = 12-13 minutes
+│     (API calls to MegaLLM/DeepSeek V3.1)
+│
+├─ 15:00-27:00 Step 3: BLOG GENERATION
+│  └─ 75 blogs × ~10-12 seconds each = 12-15 minutes
+│     (API calls to OpenRouter/Qwen)
+│
+└─ TOTAL: ~25-30 minutes for full pipeline
+
+
+DATA VOLUMES
+════════════
+
+Per Run:
+├─ Scraped articles: 100-200
+├─ WF1 insights created: 10-20 (depends on article analysis budget)
+├─ Blog posts generated: 50-100 (10-20 insights × 5 accounts)
+│
+└─ Cumulative (after 5 runs):
+   ├─ Total articles: 500-1000
+   ├─ Total insights: 50-100
+   └─ Total blogs: 250-500
+
+
+MONITORING DASHBOARD
+════════════════════
+
+Web UI: http://localhost:5000
+├─ Account selector (account_1 through account_5)
+├─ Blog list with:
+│  ├─ Title, Topic, Created date
+│  ├─ Status (draft, posted)
+│  ├─ Actions (copy, mark posted, delete)
+│  └─ Search/filter
+│
+├─ Dashboard stats:
+│  ├─ Total blogs per account
+│  ├─ Generation history
+│  ├─ Last generation time
+│  └─ Articles/insights count
+│
+└─ Settings/configuration display
+
+API Monitoring: curl requests
+├─ curl http://localhost:5000/api/accounts
+├─ curl "http://localhost:5000/api/blogs?account_id=account_1"
+├─ curl http://localhost:5000/api/dashboard/account_1
+└─ curl http://localhost:5000/api/health
+
+
+LOGGING & DEBUGGING
+═══════════════════
+
+orchestration.log
+├─ Step timings
+├─ Article/insight/blog counts
+├─ Error details
+└─ Final summary
+
+Flask console output
+├─ Endpoint calls
+├─ Generation progress
+├─ Database operations
+└─ Errors/warnings
+
+MongoDB shell
+_> db.articles.find().count()
+_> db.content_insights.find({status: 'blogs_generated'}).count()
+_> db.blogs.find({account_id: 'account_1'}).count()
+
+
+NEXT ITERATION OPTIMIZATIONS
+═════════════════════════════
+
+Not yet implemented, but possible:
+├─ Batch API calls (reduce from 75 to ~15 requests)
+├─ Parallel account generation (5x speedup)
+├─ Cached templates (skip API for similar topics)
+├─ Scheduled runs (e.g., every 6 hours)
+├─ Quality scoring (WF3 integration)
+└─ A/B testing (multiple blog variants per account)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+READY TO RUN: python orchestrate_full_pipeline.py
+
+═══════════════════════════════════════════════════════════════════════════════

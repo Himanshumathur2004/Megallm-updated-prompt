@@ -14,12 +14,17 @@ class LLMQuotaExceededError(Exception):
 
 
 def load_env_file(path: Path) -> None:
-    """Load KEY=VALUE pairs from a .env file without overriding existing env vars."""
+    """Load KEY=VALUE pairs from a .env file, allowing .env to override existing vars."""
     if not path.exists() or not path.is_file():
         return
 
     try:
-        for raw_line in path.read_text(encoding="utf-8").splitlines():
+        content = path.read_text(encoding="utf-8")
+        # Remove any BOM (Byte Order Mark) at the start
+        if content.startswith('\ufeff'):
+            content = content[1:]
+        
+        for raw_line in content.splitlines():
             line = raw_line.strip()
             if not line or line.startswith("#") or "=" not in line:
                 continue
@@ -27,7 +32,7 @@ def load_env_file(path: Path) -> None:
             key, value = line.split("=", 1)
             key = key.strip()
             value = value.strip().strip('"').strip("'")
-            if key and key not in os.environ:
+            if key:
                 os.environ[key] = value
     except OSError as exc:
         logger.warning(f"Could not read env file {path}: {exc}")

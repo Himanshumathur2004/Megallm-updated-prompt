@@ -1,0 +1,357 @@
+2026-04-01 17:44:46,293 - __main__ - INFO - ================================================================================
+2026-04-01 17:44:46,350 - __main__ - INFO - ================================================================================
+2026-04-01 17:44:46,351 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:44:46,351 - __main__ - INFO - STEP 1: SCRAPING ARTICLES FROM RSS FEEDS
+2026-04-01 17:44:46,351 - __main__ - INFO - ================================================================================
+2026-04-01 17:44:51,114 - __main__ - INFO -   Inserted: 67 new articles
+2026-04-01 17:44:51,114 - __main__ - INFO -   Skipped: 23 duplicates
+2026-04-01 17:44:51,116 - __main__ - INFO -   Total processed: 90
+2026-04-01 17:44:53,123 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:44:53,123 - __main__ - INFO - STEP 2: CREATING CONTENT INSIGHTS (WF1)
+2026-04-01 17:44:53,123 - __main__ - INFO - ================================================================================
+2026-04-01 17:44:53,123 - __main__ - ERROR - WF1 failed, stopping pipeline
+2026-04-01 17:44:53,123 - __main__ - INFO - 
+
+================================================================================
+2026-04-01 17:44:53,123 - __main__ - INFO - PIPELINE EXECUTION SUMMARY
+2026-04-01 17:44:53,123 - __main__ - INFO - ================================================================================
+2026-04-01 17:44:53,123 - __main__ - INFO - Status: FAILED
+2026-04-01 17:44:53,123 - __main__ - INFO - Start: 2026-04-01T12:14:46.350775+00:00
+2026-04-01 17:44:53,128 - __main__ - INFO - End: 2026-04-01T12:14:53.123296+00:00
+2026-04-01 17:44:53,128 - __main__ - INFO - 
+Step Results:
+2026-04-01 17:44:53,131 - __main__ - INFO -     inserted: 67
+2026-04-01 17:44:53,131 - __main__ - INFO -     skipped: 23
+2026-04-01 17:44:53,131 - __main__ - INFO -     scrape_run_id: 7d1bb911-63ff-4259-9497-9cb73be57d44
+2026-04-01 17:44:53,134 - __main__ - INFO -     error: module 'wf1' has no attribute '_build_config'
+2026-04-01 17:44:53,134 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:45:24,267 - __main__ - INFO - ================================================================================
+2026-04-01 17:45:24,282 - __main__ - INFO - ================================================================================
+2026-04-01 17:45:24,282 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:45:24,282 - __main__ - INFO - STEP 1: SCRAPING ARTICLES FROM RSS FEEDS
+2026-04-01 17:45:24,282 - __main__ - INFO - ================================================================================
+2026-04-01 17:45:31,302 - __main__ - INFO -   Inserted: 0 new articles
+2026-04-01 17:45:31,302 - __main__ - INFO -   Skipped: 90 duplicates
+2026-04-01 17:45:31,303 - __main__ - INFO -   Total processed: 90
+2026-04-01 17:45:33,318 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:45:33,318 - __main__ - INFO - STEP 2: CREATING CONTENT INSIGHTS (WF1)
+2026-04-01 17:45:33,318 - __main__ - INFO - ================================================================================
+2026-04-01 17:45:33,337 - wf1 - INFO - Starting Content Intelligence Pipeline
+2026-04-01 17:45:33,338 - wf1 - INFO - Using MegaLLM API: https://ai.megallm.io/v1
+2026-04-01 17:45:33,339 - wf1 - INFO - Model: gemini-2.5-pro
+2026-04-01 17:45:33,375 - wf1 - INFO - Fetched 67 pending articles (sorted by most recent)
+2026-04-01 17:45:33,375 - wf1 - INFO - Processing batch 1/7
+2026-04-01 17:45:33,376 - wf1 - INFO - Processing article: 69cd0c3a5aef1d02e9831f1b
+2026-04-01 17:45:37,447 - wf1 - ERROR - Qdrant search error: HTTPConnectionPool(host='localhost', port=6333): Max retries exceeded with url: /collections/content_embeddings/points/search (Caused by NewConnectionError("HTTPConnection(host='localhost', port=6333): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-04-01 17:45:38,322 - wf1 - ERROR - MegaLLM API error: 429 Client Error: Too Many Requests for url: https://ai.megallm.io/v1/chat/completions
+2026-04-01 17:45:38,322 - wf1 - ERROR - Response: Rate exceeded.
+2026-04-01 17:45:38,322 - wf1 - ERROR - LLM daily quota exceeded; stopping pipeline early.
+2026-04-01 17:45:38,322 - wf1 - WARNING - Pipeline stopped early due to LLM quota exhaustion.
+2026-04-01 17:45:38,322 - wf1 - INFO - ==================================================
+2026-04-01 17:45:38,322 - wf1 - INFO - Pipeline Summary:
+2026-04-01 17:45:38,322 - wf1 - INFO -   Total articles: 67
+2026-04-01 17:45:38,322 - wf1 - INFO -   Processed: 0
+2026-04-01 17:45:38,322 - wf1 - INFO -   Successful: 0
+2026-04-01 17:45:38,322 - wf1 - INFO -   Duplicates: 0
+2026-04-01 17:45:38,322 - wf1 - INFO -   Low ICP: 0
+2026-04-01 17:45:38,322 - wf1 - INFO -   Failed: 0
+2026-04-01 17:45:38,322 - wf1 - INFO - ==================================================
+2026-04-01 17:45:38,338 - __main__ - ERROR - WF1 failed, stopping pipeline
+2026-04-01 17:45:38,341 - __main__ - INFO - 
+
+================================================================================
+2026-04-01 17:45:38,342 - __main__ - INFO - PIPELINE EXECUTION SUMMARY
+2026-04-01 17:45:38,342 - __main__ - INFO - ================================================================================
+2026-04-01 17:45:38,342 - __main__ - INFO - Status: FAILED
+2026-04-01 17:45:38,342 - __main__ - INFO - Start: 2026-04-01T12:15:24.282861+00:00
+2026-04-01 17:45:38,344 - __main__ - INFO - End: 2026-04-01T12:15:38.341959+00:00
+2026-04-01 17:45:38,344 - __main__ - INFO - 
+Step Results:
+2026-04-01 17:45:38,348 - __main__ - INFO -     inserted: 0
+2026-04-01 17:45:38,348 - __main__ - INFO -     skipped: 90
+2026-04-01 17:45:38,349 - __main__ - INFO -     scrape_run_id: 59119181-bfa6-4b3b-98ce-8b9a1623e7a4
+2026-04-01 17:45:38,351 - __main__ - INFO -     error: 'NoneType' object has no attribute 'get'
+2026-04-01 17:45:38,351 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:46:42,695 - __main__ - INFO - ================================================================================
+2026-04-01 17:46:42,699 - __main__ - INFO - ================================================================================
+2026-04-01 17:46:42,699 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:46:42,699 - __main__ - INFO - STEP 1: SCRAPING ARTICLES FROM RSS FEEDS
+2026-04-01 17:46:42,699 - __main__ - INFO - ================================================================================
+2026-04-01 17:46:46,884 - __main__ - INFO -   Inserted: 0 new articles
+2026-04-01 17:46:46,884 - __main__ - INFO -   Skipped: 90 duplicates
+2026-04-01 17:46:46,884 - __main__ - INFO -   Total processed: 90
+2026-04-01 17:46:48,891 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:46:48,891 - __main__ - INFO - STEP 2: CREATING CONTENT INSIGHTS (WF1)
+2026-04-01 17:46:48,892 - __main__ - INFO - ================================================================================
+2026-04-01 17:46:48,898 - wf1 - INFO - Starting Content Intelligence Pipeline
+2026-04-01 17:46:48,898 - wf1 - INFO - Using MegaLLM API: https://ai.megallm.io/v1
+2026-04-01 17:46:48,898 - wf1 - INFO - Model: gemini-2.5-pro
+2026-04-01 17:46:48,960 - wf1 - INFO - Fetched 67 pending articles (sorted by most recent)
+2026-04-01 17:46:48,960 - wf1 - INFO - Processing batch 1/7
+2026-04-01 17:46:48,960 - wf1 - INFO - Processing article: 69cd0c3a5aef1d02e9831f1b
+2026-04-01 17:46:53,027 - wf1 - ERROR - Qdrant search error: HTTPConnectionPool(host='localhost', port=6333): Max retries exceeded with url: /collections/content_embeddings/points/search (Caused by NewConnectionError("HTTPConnection(host='localhost', port=6333): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-04-01 17:46:53,791 - wf1 - ERROR - MegaLLM API error: 429 Client Error: Too Many Requests for url: https://ai.megallm.io/v1/chat/completions
+2026-04-01 17:46:53,791 - wf1 - ERROR - Response: Rate exceeded.
+2026-04-01 17:46:53,791 - wf1 - ERROR - LLM daily quota exceeded; stopping pipeline early.
+2026-04-01 17:46:53,793 - wf1 - WARNING - Pipeline stopped early due to LLM quota exhaustion.
+2026-04-01 17:46:53,794 - wf1 - INFO - ==================================================
+2026-04-01 17:46:53,794 - wf1 - INFO - Pipeline Summary:
+2026-04-01 17:46:53,794 - wf1 - INFO -   Total articles: 67
+2026-04-01 17:46:53,794 - wf1 - INFO -   Processed: 0
+2026-04-01 17:46:53,794 - wf1 - INFO -   Successful: 0
+2026-04-01 17:46:53,794 - wf1 - INFO -   Duplicates: 0
+2026-04-01 17:46:53,794 - wf1 - INFO -   Low ICP: 0
+2026-04-01 17:46:53,795 - wf1 - INFO -   Failed: 0
+2026-04-01 17:46:53,795 - wf1 - INFO - ==================================================
+2026-04-01 17:46:53,795 - __main__ - WARNING - WF1 run() returned None - checking database for insights...
+2026-04-01 17:46:55,854 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:46:55,854 - __main__ - INFO - STEP 3: GENERATING BLOGS FOR 5 ACCOUNTS
+2026-04-01 17:46:55,854 - __main__ - INFO - ================================================================================
+2026-04-01 17:46:56,144 - __main__ - ERROR - Blog generation failed
+2026-04-01 17:46:56,144 - __main__ - INFO - 
+
+================================================================================
+2026-04-01 17:46:56,144 - __main__ - INFO - PIPELINE EXECUTION SUMMARY
+2026-04-01 17:46:56,144 - __main__ - INFO - ================================================================================
+2026-04-01 17:46:56,144 - __main__ - INFO - Status: PARTIAL
+2026-04-01 17:46:56,144 - __main__ - INFO - Start: 2026-04-01T12:16:42.699755+00:00
+2026-04-01 17:46:56,144 - __main__ - INFO - End: 2026-04-01T12:16:56.144670+00:00
+2026-04-01 17:46:56,144 - __main__ - INFO - 
+Step Results:
+2026-04-01 17:46:56,144 - __main__ - INFO -     inserted: 0
+2026-04-01 17:46:56,146 - __main__ - INFO -     skipped: 90
+2026-04-01 17:46:56,146 - __main__ - INFO -     scrape_run_id: 07dc70ae-6993-4bb9-9728-80917f8eb2df
+2026-04-01 17:46:56,146 - __main__ - INFO -     insights_created: 0
+2026-04-01 17:46:56,146 - __main__ - INFO -     insights_available: 36
+2026-04-01 17:46:56,146 - __main__ - INFO -     message: WF1 quota exhausted, but 36 existing insights available
+2026-04-01 17:46:56,146 - __main__ - INFO -     error: No module named 'flask_cors'
+2026-04-01 17:46:56,146 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:47:16,388 - __main__ - INFO - ================================================================================
+2026-04-01 17:47:16,392 - __main__ - INFO - ================================================================================
+2026-04-01 17:47:16,392 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:47:16,392 - __main__ - INFO - STEP 1: SCRAPING ARTICLES FROM RSS FEEDS
+2026-04-01 17:47:16,392 - __main__ - INFO - ================================================================================
+2026-04-01 17:47:21,840 - __main__ - INFO -   Inserted: 0 new articles
+2026-04-01 17:47:21,840 - __main__ - INFO -   Skipped: 90 duplicates
+2026-04-01 17:47:21,840 - __main__ - INFO -   Total processed: 90
+2026-04-01 17:47:23,848 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:47:23,848 - __main__ - INFO - STEP 2: CREATING CONTENT INSIGHTS (WF1)
+2026-04-01 17:47:23,848 - __main__ - INFO - ================================================================================
+2026-04-01 17:47:23,855 - wf1 - INFO - Starting Content Intelligence Pipeline
+2026-04-01 17:47:23,855 - wf1 - INFO - Using MegaLLM API: https://ai.megallm.io/v1
+2026-04-01 17:47:23,855 - wf1 - INFO - Model: gemini-2.5-pro
+2026-04-01 17:47:23,896 - wf1 - INFO - Fetched 67 pending articles (sorted by most recent)
+2026-04-01 17:47:23,896 - wf1 - INFO - Processing batch 1/7
+2026-04-01 17:47:23,896 - wf1 - INFO - Processing article: 69cd0c3a5aef1d02e9831f1b
+2026-04-01 17:47:27,966 - wf1 - ERROR - Qdrant search error: HTTPConnectionPool(host='localhost', port=6333): Max retries exceeded with url: /collections/content_embeddings/points/search (Caused by NewConnectionError("HTTPConnection(host='localhost', port=6333): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-04-01 17:47:28,711 - wf1 - ERROR - MegaLLM API error: 429 Client Error: Too Many Requests for url: https://ai.megallm.io/v1/chat/completions
+2026-04-01 17:47:28,711 - wf1 - ERROR - Response: Rate exceeded.
+2026-04-01 17:47:28,711 - wf1 - ERROR - LLM daily quota exceeded; stopping pipeline early.
+2026-04-01 17:47:28,713 - wf1 - WARNING - Pipeline stopped early due to LLM quota exhaustion.
+2026-04-01 17:47:28,713 - wf1 - INFO - ==================================================
+2026-04-01 17:47:28,713 - wf1 - INFO - Pipeline Summary:
+2026-04-01 17:47:28,715 - wf1 - INFO -   Total articles: 67
+2026-04-01 17:47:28,715 - wf1 - INFO -   Processed: 0
+2026-04-01 17:47:28,716 - wf1 - INFO -   Successful: 0
+2026-04-01 17:47:28,716 - wf1 - INFO -   Duplicates: 0
+2026-04-01 17:47:28,716 - wf1 - INFO -   Low ICP: 0
+2026-04-01 17:47:28,716 - wf1 - INFO -   Failed: 0
+2026-04-01 17:47:28,716 - wf1 - INFO - ==================================================
+2026-04-01 17:47:28,716 - __main__ - WARNING - WF1 run() returned None - checking database for insights...
+2026-04-01 17:47:30,777 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:47:30,777 - __main__ - INFO - STEP 3: GENERATING BLOGS FOR 5 ACCOUNTS
+2026-04-01 17:47:30,777 - __main__ - INFO - ================================================================================
+2026-04-01 17:47:31,028 - __main__ - ERROR - Blog generation failed
+2026-04-01 17:47:31,028 - __main__ - INFO - 
+
+================================================================================
+2026-04-01 17:47:31,028 - __main__ - INFO - PIPELINE EXECUTION SUMMARY
+2026-04-01 17:47:31,028 - __main__ - INFO - ================================================================================
+2026-04-01 17:47:31,028 - __main__ - INFO - Status: PARTIAL
+2026-04-01 17:47:31,028 - __main__ - INFO - Start: 2026-04-01T12:17:16.392597+00:00
+2026-04-01 17:47:31,028 - __main__ - INFO - End: 2026-04-01T12:17:31.028453+00:00
+2026-04-01 17:47:31,028 - __main__ - INFO - 
+Step Results:
+2026-04-01 17:47:31,030 - __main__ - INFO -     inserted: 0
+2026-04-01 17:47:31,030 - __main__ - INFO -     skipped: 90
+2026-04-01 17:47:31,030 - __main__ - INFO -     scrape_run_id: 7f350ae8-840d-4315-8d01-3f44482f8dbb
+2026-04-01 17:47:31,030 - __main__ - INFO -     insights_created: 0
+2026-04-01 17:47:31,030 - __main__ - INFO -     insights_available: 36
+2026-04-01 17:47:31,030 - __main__ - INFO -     message: WF1 quota exhausted, but 36 existing insights available
+2026-04-01 17:47:31,030 - __main__ - INFO -     error: No module named 'flask_cors'
+2026-04-01 17:47:31,030 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:47:53,459 - __main__ - INFO - ================================================================================
+2026-04-01 17:47:53,462 - __main__ - INFO - ================================================================================
+2026-04-01 17:47:53,462 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:47:53,464 - __main__ - INFO - STEP 1: SCRAPING ARTICLES FROM RSS FEEDS
+2026-04-01 17:47:53,464 - __main__ - INFO - ================================================================================
+2026-04-01 17:48:00,079 - __main__ - INFO -   Inserted: 0 new articles
+2026-04-01 17:48:00,079 - __main__ - INFO -   Skipped: 90 duplicates
+2026-04-01 17:48:00,079 - __main__ - INFO -   Total processed: 90
+2026-04-01 17:48:02,095 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:48:02,095 - __main__ - INFO - STEP 2: CREATING CONTENT INSIGHTS (WF1)
+2026-04-01 17:48:02,095 - __main__ - INFO - ================================================================================
+2026-04-01 17:48:02,104 - wf1 - INFO - Starting Content Intelligence Pipeline
+2026-04-01 17:48:02,104 - wf1 - INFO - Using MegaLLM API: https://ai.megallm.io/v1
+2026-04-01 17:48:02,104 - wf1 - INFO - Model: gemini-2.5-pro
+2026-04-01 17:48:02,129 - wf1 - INFO - Fetched 67 pending articles (sorted by most recent)
+2026-04-01 17:48:02,129 - wf1 - INFO - Processing batch 1/7
+2026-04-01 17:48:02,129 - wf1 - INFO - Processing article: 69cd0c3a5aef1d02e9831f1b
+2026-04-01 17:48:06,215 - wf1 - ERROR - Qdrant search error: HTTPConnectionPool(host='localhost', port=6333): Max retries exceeded with url: /collections/content_embeddings/points/search (Caused by NewConnectionError("HTTPConnection(host='localhost', port=6333): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-04-01 17:48:07,008 - wf1 - ERROR - MegaLLM API error: 429 Client Error: Too Many Requests for url: https://ai.megallm.io/v1/chat/completions
+2026-04-01 17:48:07,008 - wf1 - ERROR - Response: Rate exceeded.
+2026-04-01 17:48:07,008 - wf1 - ERROR - LLM daily quota exceeded; stopping pipeline early.
+2026-04-01 17:48:07,010 - wf1 - WARNING - Pipeline stopped early due to LLM quota exhaustion.
+2026-04-01 17:48:07,010 - wf1 - INFO - ==================================================
+2026-04-01 17:48:07,010 - wf1 - INFO - Pipeline Summary:
+2026-04-01 17:48:07,010 - wf1 - INFO -   Total articles: 67
+2026-04-01 17:48:07,010 - wf1 - INFO -   Processed: 0
+2026-04-01 17:48:07,010 - wf1 - INFO -   Successful: 0
+2026-04-01 17:48:07,010 - wf1 - INFO -   Duplicates: 0
+2026-04-01 17:48:07,010 - wf1 - INFO -   Low ICP: 0
+2026-04-01 17:48:07,010 - wf1 - INFO -   Failed: 0
+2026-04-01 17:48:07,010 - wf1 - INFO - ==================================================
+2026-04-01 17:48:07,010 - __main__ - WARNING - WF1 run() returned None - checking database for insights...
+2026-04-01 17:48:09,063 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:48:09,064 - __main__ - INFO - STEP 3: GENERATING BLOGS FOR 5 ACCOUNTS
+2026-04-01 17:48:09,064 - __main__ - INFO - ================================================================================
+2026-04-01 17:48:09,263 - __main__ - ERROR - Blog generation failed
+2026-04-01 17:48:09,263 - __main__ - INFO - 
+
+================================================================================
+2026-04-01 17:48:09,263 - __main__ - INFO - PIPELINE EXECUTION SUMMARY
+2026-04-01 17:48:09,269 - __main__ - INFO - ================================================================================
+2026-04-01 17:48:09,269 - __main__ - INFO - Status: PARTIAL
+2026-04-01 17:48:09,269 - __main__ - INFO - Start: 2026-04-01T12:17:53.462780+00:00
+2026-04-01 17:48:09,269 - __main__ - INFO - End: 2026-04-01T12:18:09.263270+00:00
+2026-04-01 17:48:09,269 - __main__ - INFO - 
+Step Results:
+2026-04-01 17:48:09,269 - __main__ - INFO -     inserted: 0
+2026-04-01 17:48:09,269 - __main__ - INFO -     skipped: 90
+2026-04-01 17:48:09,269 - __main__ - INFO -     scrape_run_id: e32ff828-6122-429c-b6d1-e5c36cf3ce9e
+2026-04-01 17:48:09,271 - __main__ - INFO -     insights_created: 0
+2026-04-01 17:48:09,271 - __main__ - INFO -     insights_available: 36
+2026-04-01 17:48:09,271 - __main__ - INFO -     message: WF1 quota exhausted, but 36 existing insights available
+2026-04-01 17:48:09,271 - __main__ - INFO -     error: No module named 'config'
+2026-04-01 17:48:09,271 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:49:05,867 - __main__ - INFO - ================================================================================
+2026-04-01 17:49:05,875 - __main__ - INFO - ================================================================================
+2026-04-01 17:49:05,875 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:49:05,875 - __main__ - INFO - STEP 1: SCRAPING ARTICLES FROM RSS FEEDS
+2026-04-01 17:49:05,875 - __main__ - INFO - ================================================================================
+2026-04-01 17:49:15,136 - __main__ - INFO -   Inserted: 0 new articles
+2026-04-01 17:49:15,137 - __main__ - INFO -   Skipped: 60 duplicates
+2026-04-01 17:49:15,137 - __main__ - INFO -   Total processed: 60
+2026-04-01 17:49:17,143 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:49:17,143 - __main__ - INFO - STEP 2: CREATING CONTENT INSIGHTS (WF1)
+2026-04-01 17:49:17,143 - __main__ - INFO - ================================================================================
+2026-04-01 17:49:17,150 - wf1 - INFO - Starting Content Intelligence Pipeline
+2026-04-01 17:49:17,150 - wf1 - INFO - Using MegaLLM API: https://ai.megallm.io/v1
+2026-04-01 17:49:17,150 - wf1 - INFO - Model: gemini-2.5-pro
+2026-04-01 17:49:17,218 - wf1 - INFO - Fetched 67 pending articles (sorted by most recent)
+2026-04-01 17:49:17,219 - wf1 - INFO - Processing batch 1/7
+2026-04-01 17:49:17,220 - wf1 - INFO - Processing article: 69cd0c3a5aef1d02e9831f1b
+2026-04-01 17:49:21,319 - wf1 - ERROR - Qdrant search error: HTTPConnectionPool(host='localhost', port=6333): Max retries exceeded with url: /collections/content_embeddings/points/search (Caused by NewConnectionError("HTTPConnection(host='localhost', port=6333): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-04-01 17:49:22,175 - wf1 - ERROR - MegaLLM API error: 429 Client Error: Too Many Requests for url: https://ai.megallm.io/v1/chat/completions
+2026-04-01 17:49:22,175 - wf1 - ERROR - Response: Rate exceeded.
+2026-04-01 17:49:22,175 - wf1 - ERROR - LLM daily quota exceeded; stopping pipeline early.
+2026-04-01 17:49:22,176 - wf1 - WARNING - Pipeline stopped early due to LLM quota exhaustion.
+2026-04-01 17:49:22,177 - wf1 - INFO - ==================================================
+2026-04-01 17:49:22,177 - wf1 - INFO - Pipeline Summary:
+2026-04-01 17:49:22,177 - wf1 - INFO -   Total articles: 67
+2026-04-01 17:49:22,177 - wf1 - INFO -   Processed: 0
+2026-04-01 17:49:22,177 - wf1 - INFO -   Successful: 0
+2026-04-01 17:49:22,177 - wf1 - INFO -   Duplicates: 0
+2026-04-01 17:49:22,177 - wf1 - INFO -   Low ICP: 0
+2026-04-01 17:49:22,177 - wf1 - INFO -   Failed: 0
+2026-04-01 17:49:22,177 - wf1 - INFO - ==================================================
+2026-04-01 17:49:22,177 - __main__ - WARNING - WF1 run() returned None - checking database for insights...
+2026-04-01 17:49:24,291 - __main__ - INFO - 
+================================================================================
+2026-04-01 17:49:24,293 - __main__ - INFO - STEP 3: GENERATING BLOGS FOR 5 ACCOUNTS
+2026-04-01 17:49:24,293 - __main__ - INFO - ================================================================================
+2026-04-01 17:49:24,503 - app - INFO - Initializing database...
+2026-04-01 17:49:24,538 - app - INFO - Initializing LLM client...
+2026-04-01 17:49:24,538 - app - INFO - Using BlogGenerator with OpenRouter API
+2026-04-01 17:49:24,538 - app - INFO - Initializing accounts...
+2026-04-01 17:49:24,560 - app - INFO - Accounts initialized: 0 created, 5 existing
+2026-04-01 17:49:24,603 - __main__ - INFO - Found 2 insights pending generation
+2026-04-01 17:49:24,603 - __main__ - INFO - 
+Generating blogs for account_1...
+2026-04-01 17:50:51,993 - blog_generator - INFO - API Response Status: 200
+2026-04-01 17:50:52,052 - __main__ - INFO -   [1/10] Generated blog for account_1: Scaling Multi-Agent Security Without Breaking the ...
+2026-04-01 17:53:04,963 - blog_generator - INFO - API Response Status: 200
+2026-04-01 17:53:04,984 - __main__ - INFO -   [2/10] Generated blog for account_1: Context-Aware Authentication for Fast, Secure AI S...
+2026-04-01 17:53:04,985 - __main__ - INFO - 
+Generating blogs for account_2...
+2026-04-01 17:54:54,701 - blog_generator - INFO - API Response Status: 200
+2026-04-01 17:54:54,825 - __main__ - INFO -   [1/10] Generated blog for account_2: Optimizing Inference Costs for Multi-Agent Securit...
+2026-04-01 17:56:38,270 - blog_generator - INFO - API Response Status: 200
+2026-04-01 17:56:38,945 - __main__ - INFO -   [2/10] Generated blog for account_2: Flexible Context-Aware Authentication for Startup ...
+2026-04-01 17:56:38,975 - __main__ - INFO - 
+Generating blogs for account_3...
+2026-04-01 17:58:24,633 - blog_generator - INFO - API Response Status: 200
+2026-04-01 17:58:24,788 - __main__ - INFO -   [1/10] Generated blog for account_3: Optimizing Inference Costs for Multi-Agent Securit...
+2026-04-01 18:00:18,153 - blog_generator - INFO - API Response Status: 200
+2026-04-01 18:00:18,238 - __main__ - INFO -   [2/10] Generated blog for account_3: Flexible Authentication for Startup CTOs: Security...
+2026-04-01 18:00:18,248 - __main__ - INFO - 
+Generating blogs for account_4...
+2026-04-01 18:02:04,192 - blog_generator - INFO - API Response Status: 200
+2026-04-01 18:02:04,246 - __main__ - INFO -   [1/10] Generated blog for account_4: Controlling Multi-Agent AI Security Costs for CTOs...
+2026-04-01 18:03:52,683 - blog_generator - INFO - API Response Status: 200
+2026-04-01 18:03:52,699 - __main__ - INFO -   [2/10] Generated blog for account_4: Context-Aware Authentication for Fast-Growing Star...
+2026-04-01 18:03:52,703 - __main__ - INFO - 
+Generating blogs for account_5...
+2026-04-01 18:05:32,938 - blog_generator - INFO - API Response Status: 200
+2026-04-01 18:05:32,949 - __main__ - INFO -   [1/10] Generated blog for account_5: Optimizing Inference Costs for Multi-Agent Securit...
+2026-04-01 18:07:07,246 - blog_generator - INFO - API Response Status: 200
+2026-04-01 18:07:07,256 - __main__ - INFO -   [2/10] Generated blog for account_5: Flexible Authentication for Startup CTOs: Security...
+2026-04-01 18:07:07,292 - __main__ - INFO -   Total blogs generated: 10
+2026-04-01 18:07:07,292 - __main__ - INFO -   Blogs per account: {'account_1': 2, 'account_2': 2, 'account_3': 2, 'account_4': 2, 'account_5': 2}
+2026-04-01 18:07:07,305 - __main__ - INFO - 
+
+================================================================================
+2026-04-01 18:07:07,305 - __main__ - INFO - PIPELINE EXECUTION SUMMARY
+2026-04-01 18:07:07,305 - __main__ - INFO - ================================================================================
+2026-04-01 18:07:07,305 - __main__ - INFO - Status: SUCCESS
+2026-04-01 18:07:07,305 - __main__ - INFO - Start: 2026-04-01T12:19:05.875789+00:00
+2026-04-01 18:07:07,305 - __main__ - INFO - End: 2026-04-01T12:37:07.305536+00:00
+2026-04-01 18:07:07,305 - __main__ - INFO - 
+Step Results:
+2026-04-01 18:07:07,305 - __main__ - INFO -     inserted: 0
+2026-04-01 18:07:07,305 - __main__ - INFO -     skipped: 60
+2026-04-01 18:07:07,305 - __main__ - INFO -     scrape_run_id: 4f14ff47-ab34-424d-ad19-148ea8055b85
+2026-04-01 18:07:07,308 - __main__ - INFO -     insights_created: 0
+2026-04-01 18:07:07,308 - __main__ - INFO -     insights_available: 36
+2026-04-01 18:07:07,308 - __main__ - INFO -     message: WF1 quota exhausted, but 36 existing insights available
+2026-04-01 18:07:07,308 - __main__ - INFO -     total_blogs_generated: 10
+2026-04-01 18:07:07,308 - __main__ - INFO -     accounts_processed: 5
+2026-04-01 18:07:07,316 - __main__ - INFO -     blogs_per_account: {
+      "account_1": 2,
+      "account_2": 2,
+      "account_3": 2,
+      "account_4": 2,
+      "account_5": 2
+}
+2026-04-01 18:07:07,317 - __main__ - INFO - 
+================================================================================
