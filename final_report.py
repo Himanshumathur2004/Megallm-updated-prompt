@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 
-db = MongoClient('mongodb://localhost:27017')['megallm']
+import os
+db = MongoClient(os.getenv('MONGODB_URI', 'mongodb://localhost:27017'))[os.getenv('MONGODB_DB', 'megallm')]
 
 # Get platform breakdown
 platforms = list(db.generated_posts.aggregate([{'$group': {'_id': '$platform', 'count': {'$sum': 1}}}]))

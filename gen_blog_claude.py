@@ -34,7 +34,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-db = MongoClient('mongodb://localhost:27017')['megallm']
+db = MongoClient(os.getenv('MONGODB_URI', 'mongodb://localhost:27017'))[os.getenv('MONGODB_DB', 'megallm')]
 collection = db.generated_posts
 
 # Get MegaLLM config
