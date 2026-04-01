@@ -14,6 +14,7 @@ from blog_generator import BlogGenerator
 from mock_blog_generator import MockBlogGenerator
 from insight_scheduler import generate_blogs_from_insights_now
 from scheduler import BlogScheduler
+from render_pipeline import create_render_pipeline
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -319,6 +320,66 @@ def generate_blogs():
         "error": error,
         "message": f"Successfully generated {generated_count} blogs"
     }), 200 if not error else 500
+
+
+@app.route("/api/pipeline/run-complete", methods=["POST"])
+def run_complete_pipeline():
+    """
+    Run the complete blog generation pipeline on Render.
+    
+    This endpoint orchestrates:
+    1. Scrape articles from RSS feeds
+    2. Analyze articles with WF1
+    3. Generate blogs for all 5 accounts from insights
+    
+    All steps run sequentially, handling failures gracefully.
+    
+    Returns:
+        {
+            "success": true,
+            "total_blogs_generated": 15,
+            "steps": {
+                "scrape": {...},
+                "insights": {...},
+                "generation": {...}
+            },
+            "start_time": "...",
+            "end_time": "..."
+        }
+    """
+    logger.info("[COMPLETE PIPELINE] /api/pipeline/run-complete called")
+    
+    if not blog_generator or not db:
+        logger.error("[PIPELINE ERROR] Blog generator or database not initialized")
+        return jsonify({
+            "error": "Blog generator or database not initialized",
+            "message": "Check .env configuration and API keys"
+        }), 500
+    
+    try:
+        # Create and run pipeline
+        pipeline = create_render_pipeline(db, blog_generator, Config)
+        result = pipeline.run_complete_pipeline()
+        
+        logger.info(f"[PIPELINE COMPLETE] Generated {result.get('total_blogs_generated')} blogs")
+        
+        # Log the pipeline run
+        try:
+            db.log_pipeline_run(result)
+        except Exception as e:
+            logger.warning(f"Could not log pipeline run: {e}")
+        
+        return jsonify(result), 200 if result.get("success") else 500
+    
+    except Exception as e:
+        error_msg = f"Pipeline execution failed: {str(e)}"
+        logger.error(f"[PIPELINE ERROR] {error_msg}", exc_info=True)
+        
+        return jsonify({
+            "success": False,
+            "error": error_msg,
+            "message": "Check logs for details"
+        }), 500
 
 
 @app.route("/api/blogs/<blog_id>/mark-posted", methods=["PUT"])

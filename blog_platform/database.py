@@ -377,6 +377,22 @@ class Database:
                 }
             )
     
+    def log_pipeline_run(self, result: Dict) -> None:
+        """Log a complete pipeline run."""
+        if self.is_memory:
+            return
+        
+        try:
+            self.db.pipeline_runs.insert_one({
+                "result": result,
+                "total_blogs": result.get("total_blogs_generated", 0),
+                "success": result.get("success", False),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
+        except Exception as e:
+            # Don't fail if logging fails
+            pass
+    
     def get_generation_history(self, account_id: str, limit: int = 10) -> List[Dict]:
         """Get generation history for an account."""
         if self.is_memory:

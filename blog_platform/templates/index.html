@@ -913,35 +913,62 @@
             }
         }
 
-        // Generate blogs now
+        // Generate blogs now - runs complete pipeline (scrape → analyze → generate)
         async function generateBlogsNow() {
-            if (!currentAccount) return;
-
             const btn = document.getElementById('generateBtnText');
             const originalText = btn.textContent;
-            btn.innerHTML = '<span class="loading"></span> Generating...';
+            btn.innerHTML = '<span class="loading"></span> Pipeline running...';
+            btn.disabled = true;
 
             try {
-                const response = await fetch(`${API_BASE}/blogs/generate`, {
+                showToast('Starting complete pipeline: Scrape → Analyze → Generate...', 'info');
+                
+                const response = await fetch(`${API_BASE}/pipeline/run-complete`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ account_id: currentAccount })
+                    body: JSON.stringify({})
                 });
 
                 const data = await response.json();
 
-                if (response.ok) {
-                    showToast(`✓ Generated ${data.generated_count} blogs!`, 'success');
-                    await loadBlogs();
-                    await refreshDashboard();
+                if (response.ok && data.success) {
+                    showToast(`✅ Pipeline complete! Generated ${data.total_blogs_generated} blogs`, 'success');
+                    
+                    // Show detailed results
+                    const scrape = data.steps.scrape;
+                    const insights = data.steps.insights;
+                    const gen = data.steps.generation;
+                    
+                    const details = `
+                        📰 Scraped: ${scrape.inserted || 0} articles
+                        🧠 Analyzed: ${insights.insights_created || 0} insights
+                        📝 Generated: ${gen.total_blogs || 0} blogs
+                    `;
+                    showToast(details, 'success');
+                    
+                    // Refresh dashboard after a short delay to let data process
+                    setTimeout(() => {
+                        refreshDashboard();
+                        loadBlogs();
+                    }, 2000);
                 } else {
-                    showToast(`Error: ${data.error}`, 'error');
+                    showToast(`⚠️ Pipeline completed with issues: ${data.error || data.message}`, 'error');
+                    
+                    // Still show what was generated
+                    if (data.total_blogs_generated > 0) {
+                        showToast(`Generated ${data.total_blogs_generated} blogs despite errors`, 'warning');
+                        setTimeout(() => {
+                            refreshDashboard();
+                            loadBlogs();
+                        }, 2000);
+                    }
                 }
             } catch (err) {
-                console.error('Error generating blogs:', err);
-                showToast('Error generating blogs', 'error');
+                console.error('Error running pipeline:', err);
+                showToast('Error running pipeline: ' + err.message, 'error');
             } finally {
                 btn.textContent = originalText;
+                btn.disabled = false;
             }
         }
 
