@@ -197,6 +197,34 @@ def test_endpoint():
     }), 200
 
 
+@app.route("/api/diagnostic", methods=["GET"])
+def diagnostic():
+    """Diagnostic endpoint to check database and config status."""
+    import os
+    
+    mongodb_uri = os.getenv("MONGODB_URI", "NOT SET")
+    mongodb_uri_masked = mongodb_uri[:50] + "..." if len(mongodb_uri) > 50 else mongodb_uri
+    
+    return jsonify({
+        "database": {
+            "type": "in-memory" if db.is_memory else "MongoDB",
+            "mongodb_uri": mongodb_uri_masked if mongodb_uri != "NOT SET" else "NOT SET",
+            "db_name": Config.MONGODB_DB,
+            "is_memory_fallback": db.is_memory,
+            "warning": "USING IN-MEMORY DATABASE - DATA WILL BE LOST ON RESTART!" if db.is_memory else "Using MongoDB Atlas"
+        },
+        "config": {
+            "openrouter_configured": bool(Config.OPENROUTER_API_KEY),
+            "accounts_count": len(Config.ACCOUNTS),
+            "topics_count": len(Config.TOPICS)
+        },
+        "data": {
+            "total_accounts": len(db.get_all_accounts()),
+            "total_blogs": sum(len(db.get_blogs_by_account(a['account_id'])) for a in db.get_all_accounts())
+        }
+    }), 200
+
+
 @app.route("/api/blogs/generate", methods=["POST"])
 @validate_account
 def generate_blogs():
