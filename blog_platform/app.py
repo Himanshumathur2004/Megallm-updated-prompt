@@ -7,6 +7,7 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 import sys
+from threading import Thread
 
 from config import Config
 from database import Database
@@ -254,41 +255,26 @@ def generate_blogs():
     }), 200 if not error else 500
 
 
-@app.route("/api/pipeline/run-complete", methods=["POST"])
-def run_complete_pipeline():
+def _generate_blogs_background():
     """
-    Simplified pipeline: Generate 1 blog per account (5 total).
-    Quick execution to avoid timeouts.
+    Background task: Generate 1 blog per account.
+    Runs in separate thread to avoid blocking client.
     """
-    if not blog_generator or not db:
-        return jsonify({
-            "error": "Blog generator not initialized",
-            "message": "Check .env configuration"
-        }), 500
-    
     try:
-        results = {
-            "success": True,
-            "total_blogs_generated": 0,
-            "steps": {
-                "scrape": {"success": True, "inserted": 0},
-                "insights": {"success": True, "insights_created": 0},
-                "generation": {"total_blogs": 0, "accounts": {}}
-            }
-        }
-        
-        # Generate 1 blog per account (5 total - fast execution)
+        logger.info("Starting background blog generation...")
         all_accounts = db.get_all_accounts()
+        total_generated = 0
         
         for account in all_accounts:
             account_id = account.get("account_id")
-            generated_count = 0
+            account_name = account.get("name", account_id)
             
-            # Pick first topic (random would be option, but this is simpler)
+            # Pick first topic
             first_topic_id = list(Config.TOPICS.keys())[0]
             topic_info = Config.TOPICS[first_topic_id]
             
             try:
+                logger.info(f"Generating blog for {account_name}...")
                 blog_data = blog_generator.generate_blog(
                     topic=topic_info["name"],
                     topic_description=topic_info["description"],
@@ -299,17 +285,46 @@ def run_complete_pipeline():
                     blog_data["account_id"] = account_id
                     blog_data["topic"] = first_topic_id
                     db.insert_blog(blog_data)
-                    generated_count = 1
+                    total_generated += 1
+                    logger.info(f"✓ Generated blog for {account_name}")
             except Exception as e:
                 logger.error(f"Error generating blog for {account_id}: {e}")
-            
-            results["steps"]["generation"]["accounts"][account_id] = {
-                "generated": generated_count,
-                "name": account.get("name", account_id)
-            }
-            results["total_blogs_generated"] += generated_count
         
-        return jsonify(results), 200
+        logger.info(f"Background generation complete: {total_generated} blogs created")
+    except Exception as e:
+        logger.error(f"Background generation failed: {e}")
+
+
+@app.route("/api/pipeline/run-complete", methods=["POST"])
+def run_complete_pipeline():
+    """
+    Pipeline endpoint: Start background blog generation and return immediately.
+    Prevents timeout errors by not waiting for API calls.
+    """
+    if not blog_generator or not db:
+        return jsonify({
+            "error": "Blog generator not initialized",
+            "message": "Check .env configuration"
+        }), 500
+    
+    try:
+        # Start background generation thread
+        bg_thread = Thread(target=_generate_blogs_background, daemon=True)
+        bg_thread.start()
+        logger.info("Background blog generation started")
+        
+        # Return success immediately (blogs will appear as they're generated)
+        return jsonify({
+            "success": True,
+            "message": "Blog generation started in background",
+            "status": "pending",
+            "info": "Blogs will appear in the dashboard as they're generated",
+            "steps": {
+                "scrape": {"success": True, "inserted": 0},
+                "insights": {"success": True, "insights_created": 0},
+                "generation": {"total_blogs": 0, "accounts": {}}
+            }
+        }), 200
         
     except Exception as e:
         error_msg = f"Pipeline error: {str(e)}"
@@ -318,8 +333,7 @@ def run_complete_pipeline():
         return jsonify({
             "success": False,
             "error": error_msg,
-            "total_blogs_generated": 0,
-            "steps": {"scrape": {}, "insights": {}, "generation": {}}
+            "status": "failed"
         }), 500
 
 
