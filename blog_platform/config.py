@@ -12,23 +12,23 @@ load_dotenv(env_path)
 class Config:
     """Base configuration."""
     
-    # MongoDB
-    MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+    # MongoDB - Use MONGODB_URI from .env (Atlas)
+    MONGODB_URI = os.getenv("MONGODB_URI")
+    if not MONGODB_URI:
+        raise ValueError("MONGODB_URI environment variable must be set in .env file. Use MongoDB Atlas connection string.")
     MONGODB_DB = os.getenv("MONGODB_DB", "megallm_blog_platform")
     
-    # API Configuration - Support MegaLLM or OpenRouter
-    USE_OPENROUTER = os.getenv("USE_OPENROUTER", "true").lower() == "true"
+    # OpenRouter API Configuration (Primary)
+    OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+    if not OPENROUTER_API_KEY:
+        raise ValueError("OPENROUTER_API_KEY environment variable must be set in .env file.")
+    OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+    OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "qwen/qwen3.6-plus-preview:free")
     
-    if USE_OPENROUTER:
-        # OpenRouter API - Use OpenRouter key for OpenRouter endpoint
-        MEGALLM_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-        MEGALLM_BASE_URL = "https://openrouter.ai/api/v1"
-        MEGALLM_MODEL = os.getenv("OPENROUTER_MODEL", "qwen/qwen3.6-plus-preview:free")
-    else:
-        # MegaLLM API (fallback)
-        MEGALLM_API_KEY = os.getenv("MEGALLM_API_KEY", os.getenv("OPENAI_API_KEY", ""))
-        MEGALLM_BASE_URL = "https://ai.megallm.io/v1"
-        MEGALLM_MODEL = os.getenv("MEGALLM_MODEL", "deepseek-ai/deepseek-v3.1")
+    # Backward compatibility - map OPENROUTER to MEGALLM names
+    MEGALLM_API_KEY = OPENROUTER_API_KEY
+    MEGALLM_BASE_URL = OPENROUTER_BASE_URL
+    MEGALLM_MODEL = OPENROUTER_MODEL
     
     # Blog Generation Config
     BLOG_WORD_COUNT_MIN = 500
@@ -44,26 +44,30 @@ class Config:
     TOPICS = {
         "cost_optimization": {
             "name": "Cost Optimization",
-            "description": "Reducing inference costs and optimizing spending",
-            "keywords": ["cost", "pricing", "budget", "optimization", "tokens per dollar"],
+            "description": "How MegaLLM reduces LLM inference costs through intelligent model routing, token optimization, and smart caching strategies",
+            "keywords": ["cost", "pricing", "budget", "optimization", "tokens per dollar", "model routing", "fallback strategies"],
+            "megallm_focus": "Model selection and cost reduction",
             "blogs_per_cycle": 3
         },
         "performance": {
             "name": "Performance & Speed",
-            "description": "Latency reduction and throughput optimization",
-            "keywords": ["latency", "speed", "throughput", "performance", "tokens per second"],
+            "description": "How MegaLLM improves latency and throughput with intelligent routing, parallel processing, and performance optimization",
+            "keywords": ["latency", "speed", "throughput", "performance", "tokens per second", "response time", "optimization"],
+            "megallm_focus": "Speed and efficiency improvements",
             "blogs_per_cycle": 3
         },
         "reliability": {
             "name": "Reliability & Uptime",
-            "description": "Ensuring production stability and failover strategies",
-            "keywords": ["reliability", "uptime", "failover", "SLA", "monitoring"],
+            "description": "How MegaLLM ensures production stability through automatic failover, load balancing, and multi-model redundancy",
+            "keywords": ["reliability", "uptime", "failover", "SLA", "monitoring", "availability", "fault tolerance"],
+            "megallm_focus": "System stability and failover handling",
             "blogs_per_cycle": 3
         },
         "infrastructure": {
             "name": "Infrastructure & Compliance",
-            "description": "Data residency, GDPR, and regional deployment",
-            "keywords": ["compliance", "GDPR", "data residency", "infrastructure", "security"],
+            "description": "How MegaLLM helps manage data residency, compliance requirements, and secure regional deployment for enterprise LLM applications",
+            "keywords": ["compliance", "GDPR", "data residency", "infrastructure", "security", "privacy", "regional deployment"],
+            "megallm_focus": "Compliance and secure deployment",
             "blogs_per_cycle": 3
         }
     }
@@ -75,9 +79,9 @@ class Config:
     
     # Accounts (predefined)
     ACCOUNTS = [
-        {"id": "account_1", "name": "Account 1", "description": "Main content account"},
-        {"id": "account_2", "name": "Account 2", "description": "Secondary publication"},
-        {"id": "account_3", "name": "Account 3", "description": "Backup content"},
-        {"id": "account_4", "name": "Account 4", "description": "Regional focus"},
-        {"id": "account_5", "name": "Account 5", "description": "Specialized topics"},
+        {"id": "account_1", "name": "ShipAIFast", "description": "Main content account"},
+        {"id": "account_2", "name": "InferenceDaily", "description": "Secondary publication"},
+        {"id": "account_3", "name": "AGIorBust", "description": "Backup content"},
+        {"id": "account_4", "name": "TokenAIz", "description": "Regional focus"},
+        {"id": "account_5", "name": "TokensAndTakes", "description": "Specialized topics"},
     ]

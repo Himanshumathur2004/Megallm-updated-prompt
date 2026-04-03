@@ -1,1 +1,57 @@
 .env
+.env.local
+
+# Test files
+check_blogs_status.py
+check_insight_status.py
+check_scraping_status.py
+error_check.py
+fix_missing_topics.py
+quick_test.py
+reset_article_status.py
+show_generated_blogs.py
+test_atlas_connection.py
+test_blog_gen.py
+test_blog_generation.py
+test_blog_generation_only.py
+test_endpoints.py
+test_generation_api.py
+test_megallm_focus.py
+test_openrouter.py
+test_pipeline.py
+test_routes.py
+test_webhook.py
+verify_openrouter_usage.py
+
+# Logs and debug files
+*.log
+endpoint_debug.log
+blog_platform.log
+
+# Report files
+*_REPORT.txt
+*_UPDATE.txt
+DASHBOARD_FILTERING_UPDATE.txt
+ERROR_CHECK_REPORT.txt
+MEGALLM_FOCUS_UPDATE.txt
+PROJECT_STATUS_REPORT.txt
+
+# Cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

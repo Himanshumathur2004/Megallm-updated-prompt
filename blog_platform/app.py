@@ -13,7 +13,6 @@ from database import Database
 from blog_generator import BlogGenerator
 from mock_blog_generator import MockBlogGenerator
 from insight_scheduler import generate_blogs_from_insights_now
-from scheduler import BlogScheduler
 from render_pipeline import create_render_pipeline
 
 # Setup logging
@@ -31,16 +30,10 @@ CORS(app)
 # Validate configuration
 def validate_config():
     """Validate required configuration."""
-    if Config.USE_OPENROUTER:
-        if not Config.MEGALLM_API_KEY or Config.MEGALLM_API_KEY == "your_openrouter_api_key_here":
-            logger.error("ERROR: OPENROUTER_API_KEY not set in .env file!")
-            logger.error("Set OPENROUTER_API_KEY=sk-or-v1-... in .env")
-            return False
-    else:
-        if not Config.MEGALLM_API_KEY:
-            logger.error("ERROR: MEGALLM_API_KEY not set in .env file!")
-            logger.error("Set MEGALLM_API_KEY=sk-mega-... in .env")
-            return False
+    if not Config.OPENROUTER_API_KEY:
+        logger.error("ERROR: OPENROUTER_API_KEY not set in .env file!")
+        logger.error("Set OPENROUTER_API_KEY=sk-or-v1-... in .env")
+        return False
     return True
 
 # Initialize database and generator
@@ -51,72 +44,45 @@ try:
     if not validate_config():
         raise ValueError("Configuration validation failed")
     
-    logger.info("Initializing database...")
     db = Database(Config.MONGODB_URI, Config.MONGODB_DB)
-    logger.info("✓ Database initialized")
     
-    logger.info("Initializing LLM client...")
-    
-    # Use real OpenRouter API
-    logger.info("Using BlogGenerator with OpenRouter API")
-    blog_generator = BlogGenerator(Config.MEGALLM_API_KEY, Config.MEGALLM_BASE_URL, Config.MEGALLM_MODEL)
-    logger.info("✓ LLM client initialized (OpenRouter)")
+    # Use OpenRouter API
+    blog_generator = BlogGenerator(Config.OPENROUTER_API_KEY, Config.OPENROUTER_BASE_URL, Config.OPENROUTER_MODEL)
+    logger.info("✓ App initialized")
     
 except Exception as e:
-    logger.error(f"✗ Initialization error: {e}")
-    logger.error("App will start in limited mode. Configure .env properly to enable full features.")
+    logger.error(f"Initialization error: {e}")
     
 # Ensure we have a database instance (either MongoDB or in-memory)
 if db is None:
     try:
-        logger.warning("Creating fallback in-memory database...")
         from database import InMemoryDatabase
         db = InMemoryDatabase()
-        logger.info("✓ In-memory database initialized")
     except Exception as e:
-        logger.error(f"Failed to initialize even fallback database: {e}")
+        logger.error(f"Failed to initialize database: {e}")
         sys.exit(1)
 
 # Ensure we have a blog generator (with fallback error handling)
 if blog_generator is None:
-    logger.warning("Blog generator not initialized - generation will fail until configured")
-    logger.warning(f"USE_OPENROUTER: {Config.USE_OPENROUTER}")
-    logger.warning(f"API_KEY: {Config.MEGALLM_API_KEY[:20] if Config.MEGALLM_API_KEY else 'NOT SET'}...")
-    logger.warning(f"BASE_URL: {Config.MEGALLM_BASE_URL}")
-    logger.warning(f"MODEL: {Config.MEGALLM_MODEL}")
+    logger.warning("Blog generator not initialized - using fallback mode")
 
 # Initialize accounts on startup
 def init_accounts():
     """Create accounts if they don't exist."""
-    logger.info("Initializing accounts...")
     created = 0
     existing = 0
     
     for account in Config.ACCOUNTS:
         if db.get_account(account["id"]):
             existing += 1
-            logger.info(f"  ✓ Account exists: {account['id']}")
         else:
             if db.create_account(account["id"], account["name"], account["description"]):
                 created += 1
-                logger.info(f"  ✓ Created account: {account['id']}")
-            else:
-                logger.warning(f"  ✗ Failed to create account: {account['id']}")
     
-    logger.info(f"Accounts initialized: {created} created, {existing} existing")
+    if created > 0:
+        logger.info(f"Accounts: {created} created, {existing} existing")
 
 init_accounts()
-
-# Initialize and start automatic blog scheduler
-scheduler = None
-try:
-    logger.info("Initializing automatic blog generation scheduler...")
-    scheduler = BlogScheduler(db, blog_generator)
-    scheduler.start()
-    logger.info(f"✓ Blog scheduler started - will generate blogs every {Config.GENERATION_INTERVAL_MINUTES} minutes")
-except Exception as e:
-    logger.error(f"✗ Failed to start scheduler: {e}")
-    logger.warning("Scheduled blog generation will be disabled - use manual generation via API")
 
 
 # ============================================================================
@@ -162,7 +128,6 @@ def validate_account(f):
 @app.route("/api/accounts", methods=["GET"])
 def get_accounts():
     """Get all accounts."""
-    print("🔴 GET /api/accounts - ENDPOINT CALLED", flush=True)
     accounts = db.get_all_accounts()
     return jsonify({"accounts": accounts}), 200
 
@@ -229,14 +194,8 @@ def test_endpoint():
 @validate_account
 def generate_blogs():
     """Generate new blogs for an account."""
-    # Debug to file since print()/logger aren't showing
-    with open("endpoint_debug.log", "a") as f:
-        f.write(f"\n=== ENDPOINT CALLED at {datetime.now().isoformat()} ===\n")
-    
-    logger.info("[ENDPOINT CALLED] /api/blogs/generate")
     
     if not blog_generator:
-        logger.error("[ERROR] Blog generator is None!")
         return jsonify({
             "error": "Blog generator not initialized",
             "message": "Check .env configuration and API key"
@@ -245,17 +204,8 @@ def generate_blogs():
     account_id = request.json.get("account_id")
     topics_to_generate = request.json.get("topics")
     
-    with open("endpoint_debug.log", "a") as f:
-        f.write(f"account_id: {account_id}\n")
-        f.write(f"topics_to_generate: {topics_to_generate}\n")
-        f.write(f"blog_generator type: {type(blog_generator)}\n")
-    
-    logger.info(f"  account_id: {account_id}")
-    logger.info(f"  topics_to_generate: {topics_to_generate}")
-    
     if not topics_to_generate:
         topics_to_generate = {topic_id: 3 for topic_id in Config.TOPICS.keys()}
-        logger.info(f"  Using default topics: {topics_to_generate}")
     
     generated_count = 0
     error = None
@@ -263,53 +213,29 @@ def generate_blogs():
     try:
         for topic_id, count in topics_to_generate.items():
             if topic_id not in Config.TOPICS:
-                logger.warning(f"Unknown topic: {topic_id}")
                 continue
             
             topic_info = Config.TOPICS[topic_id]
-            logger.info(f"  Generating {count} blogs for topic: {topic_id}")
-            with open("endpoint_debug.log", "a") as f:
-                f.write(f"  Processing topic: {topic_id}\n")
             
             for i in range(count):
-                logger.info(f"    Calling blog_generator.generate_blog()...")
                 try:
                     blog_data = blog_generator.generate_blog(
                         topic=topic_info["name"],
                         topic_description=topic_info["description"],
                         keywords=topic_info["keywords"]
                     )
-                    with open("endpoint_debug.log", "a") as f:
-                        f.write(f"      generate_blog() returned OK: {blog_data is not None}\n")
-                        if blog_data:
-                            f.write(f"      keys: {list(blog_data.keys()) if isinstance(blog_data, dict) else 'NOT_DICT'}\n")
                 except Exception as ex:
-                    with open("endpoint_debug.log", "a") as f:
-                        f.write(f"      generate_blog() EXCEPTION: {type(ex).__name__}: {ex}\n")
                     raise
-                    
-                logger.info(f"    Result: {blog_data is not None}")
                 
                 if blog_data:
                     blog_data["account_id"] = account_id
                     blog_data["topic"] = topic_id
                     blog_id = db.insert_blog(blog_data)
-                    logger.info(f"[SUCCESS] Generated blog {i+1}/{count} for {account_id}/{topic_id}: {blog_id}")
                     generated_count += 1
-                else:
-                    logger.error(f"[FAIL] Failed to generate blog {i+1}/{count} for {account_id}/{topic_id}")
         
     except Exception as e:
         error = str(e)
-        logger.error(f"[ERROR] Generation error for {account_id}: {error}", exc_info=True)
-        with open("endpoint_debug.log", "a") as f:
-            f.write(f"EXCEPTION: {error}\n")
-    
-    with open("endpoint_debug.log", "a") as f:
-        f.write(f"Generated {generated_count} blogs, error: {error}\n")
-        f.write(f"=== END ENDPOINT ===\n")
-    
-    logger.info(f"[COMPLETE] Generation: {generated_count} blogs generated, error: {error}")
+        logger.error(f"Generation error: {error}")
     
     # Log generation event
     db.log_generation(account_id, generated_count, error)
@@ -334,6 +260,8 @@ def run_complete_pipeline():
     
     All steps run sequentially, handling failures gracefully.
     
+    Can also handle webhook notifications from external pipeline services.
+    
     Returns:
         {
             "success": true,
@@ -347,10 +275,40 @@ def run_complete_pipeline():
             "end_time": "..."
         }
     """
-    logger.info("[COMPLETE PIPELINE] /api/pipeline/run-complete called")
+    # Check if this is a webhook notification (has workflow_id field)
+    try:
+        data = request.get_json() if request.is_json else {}
+        if data and 'workflow_id' in data:
+            # This is a webhook notification, delegate to webhook handler
+            workflow_id = data.get('workflow_id')
+            account_id = data.get('account_id')
+            status = data.get('status')
+            result = data.get('result', {})
+            
+            if not all([workflow_id, account_id, status]):
+                return jsonify({"error": "Missing required fields: workflow_id, account_id, status"}), 400
+            
+            if status == 'completed':
+                blogs = result.get('blogs', [])
+                return jsonify({
+                    "success": True,
+                    "message": f"Pipeline {workflow_id} processed successfully",
+                    "blogs_count": len(blogs)
+                }), 200
+            elif status == 'failed':
+                error = result.get('error', 'Unknown error')
+                return jsonify({
+                    "success": False,
+                    "message": f"Pipeline {workflow_id} failed",
+                    "error": error
+                }), 200
+            else:
+                return jsonify({"error": f"Invalid status: {status}"}), 400
+    except Exception as e:
+        pass
     
+    # Normal pipeline execution
     if not blog_generator or not db:
-        logger.error("[PIPELINE ERROR] Blog generator or database not initialized")
         return jsonify({
             "error": "Blog generator or database not initialized",
             "message": "Check .env configuration and API keys"
@@ -361,25 +319,89 @@ def run_complete_pipeline():
         pipeline = create_render_pipeline(db, blog_generator, Config)
         result = pipeline.run_complete_pipeline()
         
-        logger.info(f"[PIPELINE COMPLETE] Generated {result.get('total_blogs_generated')} blogs")
-        
         # Log the pipeline run
         try:
             db.log_pipeline_run(result)
         except Exception as e:
-            logger.warning(f"Could not log pipeline run: {e}")
+            pass
         
         return jsonify(result), 200 if result.get("success") else 500
     
     except Exception as e:
         error_msg = f"Pipeline execution failed: {str(e)}"
-        logger.error(f"[PIPELINE ERROR] {error_msg}", exc_info=True)
+        logger.error(f"Pipeline error: {error_msg}")
         
         return jsonify({
             "success": False,
             "error": error_msg,
             "message": "Check logs for details"
         }), 500
+
+
+@app.route("/api/pipeline/status", methods=["GET"])
+def pipeline_status():
+    """Get current pipeline status."""
+    return jsonify({
+        "status": "ready",
+        "message": "Pipeline ready for execution",
+        "last_run": None,
+        "next_scheduled": None
+    }), 200
+
+
+@app.route("/api/pipeline/webhook", methods=["POST", "OPTIONS"])
+def handle_pipeline_webhook():
+    """
+    Webhook endpoint for receiving pipeline completion notifications.
+    
+    Expected POST payload:
+    {
+        "workflow_id": "string",
+        "account_id": "string",
+        "status": "completed" | "failed",
+        "result": {
+            "blogs": [list of blog IDs],
+            "error": "error message if status is failed"
+        }
+    }
+    """
+    if request.method == 'OPTIONS':
+        return '', 204
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No JSON data provided"}), 400
+        
+        workflow_id = data.get('workflow_id')
+        account_id = data.get('account_id')
+        status = data.get('status')
+        result = data.get('result', {})
+        
+        if not all([workflow_id, account_id, status]):
+            return jsonify({"error": "Missing required fields: workflow_id, account_id, status"}), 400
+        
+        if status == 'completed':
+            blogs = result.get('blogs', [])
+            return jsonify({
+                "success": True,
+                "message": f"Pipeline {workflow_id} processed successfully",
+                "blogs_count": len(blogs)
+            }), 200
+        
+        elif status == 'failed':
+            error = result.get('error', 'Unknown error')
+            return jsonify({
+                "success": False,
+                "message": f"Pipeline {workflow_id} failed",
+                "error": error
+            }), 200
+        
+        else:
+            return jsonify({"error": f"Invalid status: {status}"}), 400
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/blogs/<blog_id>/mark-posted", methods=["PUT"])
@@ -435,6 +457,56 @@ def delete_blog(blog_id):
 
 
 # ============================================================================
+# INSIGHTS & ARTICLES ROUTES (Frontend Dependencies)
+# ============================================================================
+
+@app.route("/api/insights", methods=["GET"])
+def get_insights():
+    """Get insights (currently just returns empty for frontend compatibility)."""
+    return jsonify({
+        "insights": [],
+        "count": 0,
+        "message": "No insights available"
+    }), 200
+
+
+@app.route("/api/articles", methods=["GET"])
+def get_articles():
+    """Get articles (currently just returns empty for frontend compatibility)."""
+    return jsonify({
+        "articles": [],
+        "count": 0,
+        "message": "No articles available"
+    }), 200
+
+
+@app.route("/api/blogs", methods=["GET"])
+def get_all_blogs():
+    """Get all blogs across all accounts."""
+    account_id = request.args.get("account_id")
+    status = request.args.get("status")
+    limit = int(request.args.get("limit", 50))
+    offset = int(request.args.get("offset", 0))
+    
+    if account_id:
+        # If account specified, get blogs for that account
+        blogs = db.get_blogs_by_account(account_id, status=status, limit=limit, offset=offset)
+    else:
+        # Otherwise get all blogs
+        blogs = []
+    
+    # Convert ObjectId to string for JSON serialization
+    for blog in blogs:
+        if "_id" in blog:
+            blog["_id"] = str(blog["_id"])
+    
+    return jsonify({
+        "blogs": blogs,
+        "count": len(blogs)
+    }), 200
+
+
+# ============================================================================
 # DASHBOARD ROUTES
 # ============================================================================
 
@@ -466,56 +538,45 @@ def get_generation_history(account_id):
 
 
 # ============================================================================
-# INSIGHT-DRIVEN BLOG GENERATION
+# BLOG GENERATION FROM SCRAPED ARTICLES (via insights)
 # ============================================================================
 
-@app.route("/api/insights/generate-blogs", methods=["POST"])
-def generate_blogs_from_insights():
+@app.route("/api/pipeline/generate-from-articles", methods=["POST"])
+def generate_blogs_from_articles():
     """
-    Generate blog posts for all 5 accounts from WF1 content insights.
+    Generate blog posts directly from scraped articles.
     
     This endpoint:
-    1. Fetches pending insights from content_insights collection
-    2. For each account (1-5): Generates a blog post variant from each insight
-    3. Stores blogs in the blogs collection with account_id
-    4. Updates insight status to blogs_generated
+    1. Scrapes articles from RSS feeds
+    2. Generates insights from articles (WF1)
+    3. Generates blog posts for all 5 accounts from those insights
+    4. Stores blogs with account_id
     
     Request body (optional):
     {
-        "limit": 20  // max insights to process (default 20)
+        "limit": 20  // max articles to process (default: all)
     }
     
     Response:
     {
         "success": true,
-        "total_blogs": 45,  // e.g., 15 insights * 3 accounts
+        "total_blogs": 45,
+        "articles_processed": 15,
         "accounts": {
-            "account_1": {"blogs_generated": 15},
-            "account_2": {"blogs_generated": 15},
+            "account_1": 15,
+            "account_2": 15,
+            "account_3": 15,
             ...
-        },
-        "insights_processed": 15
+        }
     }
     """
-    logger.info("\n" + "=" * 80)
-    logger.info("[API] POST /api/insights/generate-blogs - TRIGGERED")
-    logger.info("=" * 80)
-    
     if not blog_generator:
-        logger.error("Blog generator not initialized")
         return jsonify({
             "error": "Blog generator not initialized",
             "message": "Check .env configuration and API key"
         }), 500
     
     try:
-        # Get insights limit from request (default 20)
-        insights_limit = 20
-        if request.is_json:
-            insights_limit = request.json.get("limit", 20)
-        
-        logger.info(f"Generating blogs from insights (limit: {insights_limit})")
-        
         # Call insight-driven generation
         result = generate_blogs_from_insights_now(
             db=db,
@@ -524,12 +585,9 @@ def generate_blogs_from_insights():
             mongodb_db=Config.MONGODB_DB
         )
         
-        logger.info(f"Blog generation from insights: {result}")
-        
         return jsonify(result), 200 if result.get("success") else 500
     
     except Exception as e:
-        logger.error(f"Error generating blogs from insights: {e}", exc_info=True)
         return jsonify({
             "success": False,
             "error": str(e),
@@ -579,23 +637,16 @@ def before_request():
 @app.teardown_appcontext
 def teardown_db(exception=None):
     """Cleanup on shutdown."""
-    global scheduler
-    if scheduler:
-        try:
-            logger.info("Stopping blog generation scheduler...")
-            scheduler.stop()
-        except Exception as e:
-            logger.error(f"Error stopping scheduler: {e}")
+    pass
 
 
 if __name__ == "__main__":
     try:
-        logger.info("Starting Blog Generation Platform API...")
         app.run(
             host="0.0.0.0",
             port=5000,
             debug=Config.DEBUG
         )
     except KeyboardInterrupt:
-        logger.info("Shutting down...")
-        db.close()
+        if db:
+            db.close()

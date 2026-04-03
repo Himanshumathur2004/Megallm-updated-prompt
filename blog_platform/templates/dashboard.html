@@ -517,35 +517,88 @@
             }
         });
 
+        // Store all blogs for filtering
+        let allBlogs = [];
+
         // Load all blogs
         document.getElementById('blogs-tab').addEventListener('click', loadAllBlogs);
         async function loadAllBlogs() {
             try {
                 const res = await fetch(`${API_BASE}/blogs`);
-                const blogs = await res.json();
-                const container = document.getElementById('blogs-list');
+                allBlogs = await res.json();
                 
-                if (!Array.isArray(blogs) || blogs.length === 0) {
-                    container.innerHTML = '<p class="text-muted">No blogs found</p>';
-                    return;
+                if (!Array.isArray(allBlogs)) {
+                    allBlogs = [];
                 }
 
-                container.innerHTML = blogs
-                    .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+                // Display filtered blogs
+                displayBlogs();
+                
+                // Setup filter listeners
+                setupBlogFilters();
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error loading blogs', 'danger');
+            }
+        }
+
+        // Display blogs with filters applied
+        function displayBlogs() {
+            const container = document.getElementById('blogs-list');
+            const searchQuery = document.getElementById('blog-search')?.value?.toLowerCase() || '';
+            const selectedAccount = document.getElementById('blog-account-filter')?.value || '';
+            
+            // Filter blogs
+            let filteredBlogs = allBlogs.filter(blog => {
+                const matchesAccount = !selectedAccount || blog.account_id === selectedAccount;
+                const matchesSearch = !searchQuery || (blog.title || '').toLowerCase().includes(searchQuery);
+                return matchesAccount && matchesSearch;
+            });
+
+            filteredBlogs = filteredBlogs.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+            if (filteredBlogs.length === 0) {
+                container.innerHTML = `<p class="text-muted">
+                    ${selectedAccount ? `No blogs found for ${selectedAccount}` : 'No blogs found'}
+                    ${searchQuery ? ` matching "${searchQuery}"` : ''}
+                </p>`;
+                return;
+            }
+
+            // Show count
+            const totalText = selectedAccount ? ` (${filteredBlogs.length} from ${selectedAccount})` : ` (${filteredBlogs.length} total)`;
+            
+            container.innerHTML = `<p class="text-muted mb-3"><small>Showing ${filteredBlogs.length} blogs${totalText}</small></p>` + 
+                filteredBlogs
                     .map(blog => `
                         <div class="blog-item">
                             <h6>${blog.title || 'Untitled'}</h6>
                             <p class="text-muted mb-2" style="font-size: 0.9rem;">${blog.body ? blog.body.substring(0, 100) + '...' : 'No content'}</p>
                             <div class="meta">
                                 <span class="badge-account">${blog.account_id || 'N/A'}</span>
+                                <span class="ms-2"><strong>Topic:</strong> ${blog.topic || 'N/A'}</span>
                                 <span class="ms-2"><strong>Status:</strong> ${blog.status || 'draft'}</span>
                                 <span class="ms-2"><strong>Date:</strong> ${new Date(blog.created_at || Date.now()).toLocaleDateString()}</span>
                             </div>
                         </div>
                     `).join('');
-            } catch (error) {
-                console.error('Error:', error);
-                showAlert('Error loading blogs', 'danger');
+        }
+
+        // Setup filter event listeners
+        function setupBlogFilters() {
+            const searchInput = document.getElementById('blog-search');
+            const accountFilter = document.getElementById('blog-account-filter');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    displayBlogs();
+                });
+            }
+            
+            if (accountFilter) {
+                accountFilter.addEventListener('change', (e) => {
+                    displayBlogs();
+                });
             }
         }
 
@@ -597,8 +650,11 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h6>${account.name || account._id}</h6>
-                                    <p class="text-muted mb-0">Email: ${account.email || 'N/A'}</p>
-                                    <p class="text-muted mb-0">Blogs: ${account.blog_count || 0}</p>
+                                    <p class="text-muted mb-2">ID: ${account.account_id || account._id}</p>
+                                    <p class="text-muted mb-2">Blogs: <strong>${account.blog_count || 0}</strong></p>
+                                    <button class="btn btn-sm btn-primary" onclick="viewAccountBlogs('${account.account_id || account._id}', '${account.name || account._id}')">
+                                        <i class="bi bi-file-earmark-text"></i> View Blogs
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -606,6 +662,32 @@
             } catch (error) {
                 console.error('Error:', error);
                 showAlert('Error loading accounts', 'danger');
+            }
+        }
+
+        // View blogs for a specific account
+        function viewAccountBlogs(accountId, accountName) {
+            // Set the account filter
+            const filterSelect = document.getElementById('blog-account-filter');
+            if (filterSelect) {
+                filterSelect.value = accountId;
+            }
+            
+            // Switch to blogs tab
+            const blogsTab = document.getElementById('blogs-tab');
+            if (blogsTab) {
+                blogsTab.click();
+                
+                // Small delay to ensure tab is loaded before displaying
+                setTimeout(() => {
+                    displayBlogs();
+                    
+                    // Scroll to blogs section
+                    document.getElementById('blogs-list')?.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Show info about current filter
+                    showAlert(`<strong>✓ Showing blogs for ${accountName}</strong> (${document.getElementById('blog-account-filter')?.value})`, 'info');
+                }, 300);
             }
         }
 

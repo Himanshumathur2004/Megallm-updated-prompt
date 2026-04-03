@@ -12,7 +12,7 @@ if env_file.exists():
     load_dotenv(env_file)
 else:
     print(f"⚠ Warning: .env not found at {env_file}")
-    print("  Create it with: MEGALLM_API_KEY=sk-mega-...")
+    print(f"  Create it with: OPENROUTER_API_KEY=sk-or-v1-...")
 
 # Add parent directory to path so imports work correctly
 sys.path.insert(0, str(Path(__file__).parent))
@@ -48,7 +48,7 @@ def main():
         scheduler.start()
         
         # Log configuration
-        logger.info(f"MegaLLM Model: {Config.MEGALLM_MODEL}")
+        logger.info(f"OpenRouter Model: {Config.OPENROUTER_MODEL}")
         logger.info(f"Blogs per 24h: {Config.BLOGS_PER_24_HOURS}")
         logger.info(f"Generation interval: {Config.GENERATION_INTERVAL_MINUTES} minutes")
         logger.info(f"Blog length: {Config.BLOG_WORD_COUNT_MIN}-{Config.BLOG_WORD_COUNT_MAX} words")

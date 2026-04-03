@@ -1,15 +1,16 @@
-"""Blog generation using MegaLLM API."""
+"""Blog generation using OpenRouter API."""
 
 import json
 import logging
 from typing import Dict, Optional
 import requests
+import random
 
 logger = logging.getLogger(__name__)
 
 
 class BlogGenerator:
-    """Generate blog posts using MegaLLM API."""
+    """Generate blog posts using OpenRouter API."""
     
     def __init__(self, api_key: str, base_url: str, model: str):
         self.api_key = api_key
@@ -34,17 +35,35 @@ class BlogGenerator:
         Returns:
             {"title": str, "body": str} or None on error
         """
-        system_prompt = f"""You are a technical content writer.
+        # Randomly decide whether to mention MegaLLM in the title (30% chance)
+        mention_megallm_in_title = random.random() < 0.3
+        
+        title_instruction = (
+            "should mention MegaLLM in the title"
+            if mention_megallm_in_title
+            else "title should focus on the problem/solution WITHOUT mentioning MegaLLM - make it sound like organic technical content"
+        )
+        
+        system_prompt = f"""You are a technical content writer writing for a tech blog.
+
+MegaLLM Context (use only in body, not always):
+- MegaLLM is a unified LLM router and optimization platform
+- It helps CTOs and AI teams reduce costs, improve performance, and ensure reliability
+- MegaLLM provides multi-model support, automatic failover, and intelligent routing
+- Target audience: CTOs at AI startups building LLM-powered applications
 
 Write a blog post about: {topic}
 
 Description: {topic_description}
 
 Requirements:
-- Title: max 10 words
+- Title: max 10 words, {title_instruction}
 - Body: {word_count_min}-{word_count_max} words
-- Simple, clear language
-- Include specific details or examples
+- Focus on: The problem, solution approaches, best practices
+- Include: Practical examples, specific metrics, or real-world scenarios
+- Optional: Can mention MegaLLM in body if relevant to the discussion
+- Use simple, clear technical language
+- Target CTOs at AI startups
 
 Return ONLY valid JSON (no markdown):
 {{
@@ -52,9 +71,19 @@ Return ONLY valid JSON (no markdown):
   "body": "Your blog post here..."
 }}"""
         
-        user_prompt = f"""Write a technical blog post about:
+        user_prompt = f"""Write a technical blog post for CTOs about:
 Topic: {topic}
 Key points: {', '.join(keywords)}
+
+IMPORTANT: This blog should:
+1. Explain why {topic} matters for LLM applications
+2. Discuss practical solutions and best practices
+3. Include specific benefits or tradeoffs
+4. Provide actionable tips or examples
+5. Be relevant to AI startups building with LLMs
+6. Sound natural and informative (not promotional)
+
+{'Note: You may mention MegaLLM in the body if it fits the discussion naturally.' if not mention_megallm_in_title else ''}
 
 Return valid JSON with title and body fields only."""
 

@@ -659,8 +659,14 @@
             <button class="btn btn-primary" onclick="generateBlogsNow()" style="font-size: 15px;">
                 <span id="generateBtnText">🚀 Generate Blogs Now</span>
             </button>
+            <button class="btn btn-primary" onclick="showViewBlogsModal()" style="font-size: 15px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);">
+                📚 View Blogs by Account
+            </button>
             <button class="btn btn-secondary" onclick="refreshDashboard()">🔄 Refresh Stats</button>
             <button class="btn btn-secondary" onclick="toggleGenerationHistory()">📋 Generation Log</button>
+            <button class="btn" onclick="showClearAccountModal()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);">
+                🗑️ Clear All Blogs
+            </button>
         </div>
 
         <div class="blogs-container">
@@ -708,6 +714,85 @@
         </div>
     </div>
 
+    <!-- View Blogs by Account Modal -->
+    <div class="modal" id="viewBlogsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📚 Select Account to View Blogs</span>
+                <button class="close-btn" onclick="closeViewBlogsModal()">×</button>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <p style="color: #64748b; margin-bottom: 16px; font-size: 14px;">Choose which account's blogs you want to see:</p>
+                <div id="accountSelectionList" style="display: grid; gap: 12px;"></div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="closeViewBlogsModal()" style="flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear All Blogs Modal -->
+    <div class="modal" id="clearBlogsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>⚠️ Delete All Blogs</span>
+                <button class="close-btn" onclick="closeClearBlogsModal()">×</button>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <p style="color: #64748b; margin-bottom: 16px; font-size: 14px;">
+                    <strong>Are you sure you want to delete all blogs for the current account?</strong>
+                </p>
+                <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px;">
+                    This action cannot be undone. All <span id="clearBlogCount">0</span> blogs will be permanently deleted.
+                </p>
+                <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 12px; border-radius: 6px;">
+                    <p style="color: #991b1b; font-size: 13px; margin: 0;">
+                        <strong>Current Account:</strong> <span id="clearBlogAccount">Account</span>
+                    </p>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="closeClearBlogsModal()" style="flex: 1;">Cancel</button>
+                <button class="btn" onclick="confirmClearAllBlogs()" style="flex: 1; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white;">
+                    🗑️ Delete All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Individual Blog Modal -->
+    <div class="modal" id="deleteBlogModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>⚠️ Delete Blog</span>
+                <button class="close-btn" onclick="closeDeleteBlogModal()">×</button>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <p style="color: #64748b; margin-bottom: 16px; font-size: 14px;">
+                    <strong>Delete this blog?</strong>
+                </p>
+                <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px;">
+                    Blog: <span id="deleteBlogTitle" style="color: #0f172a; font-weight: 600;"></span>
+                </p>
+                <p style="color: #94a3b8; font-size: 13px;">
+                    This action cannot be undone.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="closeDeleteBlogModal()" style="flex: 1;">Cancel</button>
+                <button class="btn" onclick="confirmDeleteBlog()" style="flex: 1; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white;">
+                    🗑️ Delete Blog
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = '/api';
         let currentAccount = null;
@@ -718,6 +803,23 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await loadAccounts();
             await refreshDashboard();
+
+            // Close modals when clicking outside
+            document.getElementById('copyModal').addEventListener('click', (e) => {
+                if (e.target.id === 'copyModal') closeCopyModal();
+            });
+            document.getElementById('historyModal').addEventListener('click', (e) => {
+                if (e.target.id === 'historyModal') closeHistoryModal();
+            });
+            document.getElementById('viewBlogsModal').addEventListener('click', (e) => {
+                if (e.target.id === 'viewBlogsModal') closeViewBlogsModal();
+            });
+            document.getElementById('clearBlogsModal').addEventListener('click', (e) => {
+                if (e.target.id === 'clearBlogsModal') closeClearBlogsModal();
+            });
+            document.getElementById('deleteBlogModal').addEventListener('click', (e) => {
+                if (e.target.id === 'deleteBlogModal') closeDeleteBlogModal();
+            });
         });
 
         // Load accounts and initialize UI
@@ -750,7 +852,22 @@
             currentAccount = accountId;
             currentFilter = 'all';  // Reset filter when switching accounts
             document.querySelectorAll('.account-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
+            
+            // If element is provided, mark it as active; otherwise find it by data
+            if (element) {
+                element.classList.add('active');
+            } else {
+                // Find the button with matching account ID and mark it active
+                const buttons = document.querySelectorAll('.account-btn');
+                buttons.forEach((btn, index) => {
+                    const btnIndex = index + 1;
+                    const btnAccountId = `account_${btnIndex}`;
+                    if (btnAccountId === accountId) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
             // Reset filter buttons
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             const allFilterBtn = document.querySelector('.filter-btn');
@@ -842,6 +959,7 @@
                         <div class="blog-actions">
                             <button class="btn btn-sm btn-copy" onclick="openCopyModal('${blog._id}')">📋 Copy</button>
                             ${blog.status === 'draft' ? `<button class="btn btn-sm btn-post" onclick="markPosted('${blog._id}')">✅ Mark Posted</button>` : ''}
+                            <button class="btn btn-sm" onclick="showDeleteBlogModal('${blog._id}', '${escapeHtml(blog.title)}')" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 6px 12px; font-size: 11px;">🗑️ Delete</button>
                         </div>
                     </div>
                 </li>
@@ -914,6 +1032,7 @@
         }
 
         // Generate blogs now - runs complete pipeline (scrape → analyze → generate)
+        // With real-time polling to show blogs immediately as they're generated
         async function generateBlogsNow() {
             const btn = document.getElementById('generateBtnText');
             const originalText = btn.textContent;
@@ -946,21 +1065,62 @@
                     `;
                     showToast(details, 'success');
                     
-                    // Refresh dashboard after a short delay to let data process
-                    setTimeout(() => {
-                        refreshDashboard();
-                        loadBlogs();
-                    }, 2000);
+                    // Poll for new blogs immediately - check every 200ms for up to 30 seconds
+                    // This shows blogs in the library as soon as they're generated
+                    let pollingCount = 0;
+                    const maxPolls = 150; // 30 seconds (150 * 200ms)
+                    const initialBlogCount = blogs.length;
+                    
+                    const pollInterval = setInterval(async () => {
+                        pollingCount++;
+                        try {
+                            await loadBlogs();
+                            await refreshDashboard();
+                            
+                            // If blogs have been added, stop polling
+                            if (blogs.length > initialBlogCount) {
+                                clearInterval(pollInterval);
+                                showToast('✅ New blogs are now visible in the library!', 'success');
+                            }
+                            
+                            // Stop after max polls
+                            if (pollingCount >= maxPolls) {
+                                clearInterval(pollInterval);
+                            }
+                        } catch (err) {
+                            console.error('Error during polling:', err);
+                        }
+                    }, 200);
                 } else {
                     showToast(`⚠️ Pipeline completed with issues: ${data.error || data.message}`, 'error');
                     
                     // Still show what was generated
                     if (data.total_blogs_generated > 0) {
                         showToast(`Generated ${data.total_blogs_generated} blogs despite errors`, 'warning');
-                        setTimeout(() => {
-                            refreshDashboard();
-                            loadBlogs();
-                        }, 2000);
+                        
+                        // Poll for any generated blogs
+                        let pollingCount = 0;
+                        const maxPolls = 150;
+                        const initialBlogCount = blogs.length;
+                        
+                        const pollInterval = setInterval(async () => {
+                            pollingCount++;
+                            try {
+                                await loadBlogs();
+                                await refreshDashboard();
+                                
+                                if (blogs.length > initialBlogCount) {
+                                    clearInterval(pollInterval);
+                                    showToast('✅ Generated blogs are now visible!', 'success');
+                                }
+                                
+                                if (pollingCount >= maxPolls) {
+                                    clearInterval(pollInterval);
+                                }
+                            } catch (err) {
+                                console.error('Error during polling:', err);
+                            }
+                        }, 200);
                     }
                 }
             } catch (err) {
@@ -1008,6 +1168,124 @@
         // Close history modal
         function closeHistoryModal() {
             document.getElementById('historyModal').classList.remove('active');
+        }
+
+        // Show View Blogs Modal
+        async function showViewBlogsModal() {
+            try {
+                const response = await fetch(`${API_BASE}/accounts`);
+                const data = await response.json();
+                
+                const selectionList = document.getElementById('accountSelectionList');
+                selectionList.innerHTML = '';
+                
+                data.accounts.forEach(account => {
+                    const button = document.createElement('button');
+                    button.className = 'btn btn-primary';
+                    button.style.cssText = 'width: 100%; padding: 14px; text-align: left; font-size: 14px;';
+                    button.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600;">${account.name}</span>
+                            <span style="font-size: 12px; opacity: 0.9;">${account.blog_count || 0} blogs</span>
+                        </div>
+                    `;
+                    button.onclick = () => viewAccountBlogs(account.account_id);
+                    selectionList.appendChild(button);
+                });
+                
+                document.getElementById('viewBlogsModal').classList.add('active');
+            } catch (err) {
+                console.error('Error loading accounts for modal:', err);
+                showToast('Error loading accounts', 'error');
+            }
+        }
+
+        // Close View Blogs Modal
+        function closeViewBlogsModal() {
+            document.getElementById('viewBlogsModal').classList.remove('active');
+        }
+
+        // View blogs for selected account
+        function viewAccountBlogs(accountId) {
+            selectAccount(accountId, null);
+            closeViewBlogsModal();
+            showToast(`📚 Showing blogs for ${accountId.replace('_', ' ').toUpperCase()}`, 'success');
+        }
+
+        // Show Clear All Blogs Modal
+        function showClearAccountModal() {
+            if (!currentAccount || blogs.length === 0) {
+                showToast('No blogs to delete for current account', 'error');
+                return;
+            }
+
+            document.getElementById('clearBlogCount').textContent = blogs.length;
+            document.getElementById('clearBlogAccount').textContent = currentAccount.replace('_', ' ').toUpperCase();
+            document.getElementById('clearBlogsModal').classList.add('active');
+        }
+
+        // Close Clear Blogs Modal
+        function closeClearBlogsModal() {
+            document.getElementById('clearBlogsModal').classList.remove('active');
+        }
+
+        // Confirm and clear all blogs for account
+        async function confirmClearAllBlogs() {
+            closeClearBlogsModal();
+            
+            try {
+                // Delete all blogs for current account
+                const deletePromises = blogs.map(blog => 
+                    fetch(`${API_BASE}/blogs/${blog._id}`, { method: 'DELETE' })
+                );
+
+                await Promise.all(deletePromises);
+
+                showToast(`✅ Deleted all ${blogs.length} blogs for ${currentAccount}`, 'success');
+                await loadBlogs();
+                await refreshDashboard();
+            } catch (err) {
+                console.error('Error deleting blogs:', err);
+                showToast('Error deleting blogs', 'error');
+            }
+        }
+
+        // Show Delete Individual Blog Modal
+        let blogToDelete = null;
+        function showDeleteBlogModal(blogId, blogTitle) {
+            blogToDelete = blogId;
+            document.getElementById('deleteBlogTitle').textContent = blogTitle.substring(0, 60);
+            document.getElementById('deleteBlogModal').classList.add('active');
+        }
+
+        // Close Delete Blog Modal
+        function closeDeleteBlogModal() {
+            document.getElementById('deleteBlogModal').classList.remove('active');
+            blogToDelete = null;
+        }
+
+        // Confirm and delete individual blog
+        async function confirmDeleteBlog() {
+            if (!blogToDelete) return;
+
+            closeDeleteBlogModal();
+            
+            try {
+                const response = await fetch(`${API_BASE}/blogs/${blogToDelete}`, { method: 'DELETE' });
+                
+                if (response.ok) {
+                    showToast('✅ Blog deleted successfully', 'success');
+                    await loadBlogs();
+                    await refreshDashboard();
+                } else {
+                    showToast('Error deleting blog', 'error');
+                }
+            } catch (err) {
+                console.error('Error deleting blog:', err);
+                showToast('Error deleting blog', 'error');
+            }
+
+            blogToDelete = null;
         }
 
         // Show toast notification

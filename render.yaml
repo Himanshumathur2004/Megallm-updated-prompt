@@ -14,7 +14,7 @@ web:
       value: megallm_blog_platform
     - key: OPENROUTER_API_KEY
       scope: runtime
-      value: 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
+      value: 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
     - key: USE_OPENROUTER
       value: "true"
     - key: OPENROUTER_MODEL
