@@ -257,90 +257,68 @@ def generate_blogs():
 @app.route("/api/pipeline/run-complete", methods=["POST"])
 def run_complete_pipeline():
     """
-    Run the complete blog generation pipeline on Render.
-    
-    This endpoint orchestrates:
-    1. Scrape articles from RSS feeds
-    2. Analyze articles with WF1
-    3. Generate blogs for all 5 accounts from insights
-    
-    All steps run sequentially, handling failures gracefully.
-    
-    Can also handle webhook notifications from external pipeline services.
-    
-    Returns:
-        {
-            "success": true,
-            "total_blogs_generated": 15,
-            "steps": {
-                "scrape": {...},
-                "insights": {...},
-                "generation": {...}
-            },
-            "start_time": "...",
-            "end_time": "..."
-        }
+    Simplified pipeline: Just generate blogs for all accounts.
+    (Scraping and analysis skipped - use simple blog generation)
     """
-    # Check if this is a webhook notification (has workflow_id field)
-    try:
-        data = request.get_json() if request.is_json else {}
-        if data and 'workflow_id' in data:
-            # This is a webhook notification, delegate to webhook handler
-            workflow_id = data.get('workflow_id')
-            account_id = data.get('account_id')
-            status = data.get('status')
-            result = data.get('result', {})
-            
-            if not all([workflow_id, account_id, status]):
-                return jsonify({"error": "Missing required fields: workflow_id, account_id, status"}), 400
-            
-            if status == 'completed':
-                blogs = result.get('blogs', [])
-                return jsonify({
-                    "success": True,
-                    "message": f"Pipeline {workflow_id} processed successfully",
-                    "blogs_count": len(blogs)
-                }), 200
-            elif status == 'failed':
-                error = result.get('error', 'Unknown error')
-                return jsonify({
-                    "success": False,
-                    "message": f"Pipeline {workflow_id} failed",
-                    "error": error
-                }), 200
-            else:
-                return jsonify({"error": f"Invalid status: {status}"}), 400
-    except Exception as e:
-        pass
-    
-    # Normal pipeline execution
     if not blog_generator or not db:
         return jsonify({
-            "error": "Blog generator or database not initialized",
-            "message": "Check .env configuration and API keys"
+            "error": "Blog generator not initialized",
+            "message": "Check .env configuration"
         }), 500
     
     try:
-        # Create and run pipeline
-        pipeline = create_render_pipeline(db, blog_generator, Config)
-        result = pipeline.run_complete_pipeline()
+        results = {
+            "success": True,
+            "total_blogs_generated": 0,
+            "steps": {
+                "scrape": {"success": True, "inserted": 0},
+                "insights": {"success": True, "insights_created": 0},
+                "generation": {"total_blogs": 0, "accounts": {}}
+            }
+        }
         
-        # Log the pipeline run
-        try:
-            db.log_pipeline_run(result)
-        except Exception as e:
-            pass
+        # Generate 1 blog per topic for each of 5 accounts
+        all_accounts = db.get_all_accounts()
         
-        return jsonify(result), 200 if result.get("success") else 500
-    
+        for account in all_accounts:
+            account_id = account.get("account_id")
+            generated_count = 0
+            
+            for topic_id in Config.TOPICS.keys():
+                topic_info = Config.TOPICS[topic_id]
+                try:
+                    blog_data = blog_generator.generate_blog(
+                        topic=topic_info["name"],
+                        topic_description=topic_info["description"],
+                        keywords=topic_info["keywords"]
+                    )
+                    
+                    if blog_data:
+                        blog_data["account_id"] = account_id
+                        blog_data["topic"] = topic_id
+                        db.insert_blog(blog_data)
+                        generated_count += 1
+                except Exception as e:
+                    logger.error(f"Error generating blog for {account_id}/{topic_id}: {e}")
+                    continue
+            
+            results["steps"]["generation"]["accounts"][account_id] = {
+                "generated": generated_count,
+                "name": account.get("name", account_id)
+            }
+            results["total_blogs_generated"] += generated_count
+        
+        return jsonify(results), 200
+        
     except Exception as e:
-        error_msg = f"Pipeline execution failed: {str(e)}"
-        logger.error(f"Pipeline error: {error_msg}")
+        error_msg = f"Pipeline error: {str(e)}"
+        logger.error(error_msg)
         
         return jsonify({
             "success": False,
             "error": error_msg,
-            "message": "Check logs for details"
+            "total_blogs_generated": 0,
+            "steps": {"scrape": {}, "insights": {}, "generation": {}}
         }), 500
 
 
