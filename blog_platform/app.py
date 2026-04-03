@@ -257,8 +257,8 @@ def generate_blogs():
 @app.route("/api/pipeline/run-complete", methods=["POST"])
 def run_complete_pipeline():
     """
-    Simplified pipeline: Just generate blogs for all accounts.
-    (Scraping and analysis skipped - use simple blog generation)
+    Simplified pipeline: Generate 1 blog per account (5 total).
+    Quick execution to avoid timeouts.
     """
     if not blog_generator or not db:
         return jsonify({
@@ -277,30 +277,31 @@ def run_complete_pipeline():
             }
         }
         
-        # Generate 1 blog per topic for each of 5 accounts
+        # Generate 1 blog per account (5 total - fast execution)
         all_accounts = db.get_all_accounts()
         
         for account in all_accounts:
             account_id = account.get("account_id")
             generated_count = 0
             
-            for topic_id in Config.TOPICS.keys():
-                topic_info = Config.TOPICS[topic_id]
-                try:
-                    blog_data = blog_generator.generate_blog(
-                        topic=topic_info["name"],
-                        topic_description=topic_info["description"],
-                        keywords=topic_info["keywords"]
-                    )
-                    
-                    if blog_data:
-                        blog_data["account_id"] = account_id
-                        blog_data["topic"] = topic_id
-                        db.insert_blog(blog_data)
-                        generated_count += 1
-                except Exception as e:
-                    logger.error(f"Error generating blog for {account_id}/{topic_id}: {e}")
-                    continue
+            # Pick first topic (random would be option, but this is simpler)
+            first_topic_id = list(Config.TOPICS.keys())[0]
+            topic_info = Config.TOPICS[first_topic_id]
+            
+            try:
+                blog_data = blog_generator.generate_blog(
+                    topic=topic_info["name"],
+                    topic_description=topic_info["description"],
+                    keywords=topic_info["keywords"]
+                )
+                
+                if blog_data:
+                    blog_data["account_id"] = account_id
+                    blog_data["topic"] = first_topic_id
+                    db.insert_blog(blog_data)
+                    generated_count = 1
+            except Exception as e:
+                logger.error(f"Error generating blog for {account_id}: {e}")
             
             results["steps"]["generation"]["accounts"][account_id] = {
                 "generated": generated_count,
