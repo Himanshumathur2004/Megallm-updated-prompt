@@ -3,7 +3,7 @@
 from pymongo import MongoClient
 from bson import ObjectId
 
-db = MongoClient('mongodb://localhost:27017')['megallm']
+db = MongoClient(os.getenv('MONGODB_URI'))[os.getenv('MONGODB_DB', 'megallm')]
 
 # Check if the post exists
 post_id = ObjectId('69c2b21ac5134aa57c2009b6')

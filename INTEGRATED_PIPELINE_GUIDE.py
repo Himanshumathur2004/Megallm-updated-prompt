@@ -128,9 +128,9 @@ CONFIGURATION:
 ──────────────
 The following .env settings are important:
 
-  # MongoDB
-  MONGODB_URI=mongodb://localhost:27017
-  MONGODB_DB=megallm
+# MongoDB Atlas Configuration
+  MONGODB_URI=mongodb+srv://himanshu123:himanshu123@cluster0.ecqcp1z.mongodb.net/?appName=Cluster0
+  MONGODB_DB=megallm_blog_platform
   
   # OpenRouter API (for blog generation)
   OPENROUTER_API_KEY=sk-or-v1-...
@@ -178,7 +178,7 @@ TROUBLESHOOTING:
 
 NEXT STEPS:
 ───────────
-1. Verify MongoDB is running (localhost:27017)
+1. Verify MongoDB Atlas is configured (check MONGODB_URI in .env)
 2. Verify .env file has valid API keys
 3. Run full pipeline: python orchestrate_full_pipeline.py
 4. Monitor Flask dashboard: http://localhost:5000

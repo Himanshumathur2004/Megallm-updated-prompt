@@ -46,10 +46,13 @@ def check_mongodb():
     
     try:
         from pymongo import MongoClient
-        client = MongoClient('mongodb://localhost:27017', serverSelectionTimeoutMS=2000)
+        mongodb_uri = os.getenv('MONGODB_URI')
+        if not mongodb_uri:
+            raise ValueError("MONGODB_URI not set in .env")
+        client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
         client.admin.command('ping')
         client.close()
-        print("✓ MongoDB is running on localhost:27017")
+        print(f"✓ MongoDB connected: {mongodb_uri.split('@')[-1] if '@' in mongodb_uri else 'Atlas'}")
         return True
     except Exception as e:
         print(f"✗ MongoDB connection failed: {e}")
@@ -68,9 +71,9 @@ def check_env_file():
         print(f"✗ .env file not found at {env_path}")
         print("\nCreate a .env file with:")
         print("""
-MEGALLM_API_KEY=sk-mega-xxxxxxxxxxxxx
-OPENAI_API_KEY=sk-mega-xxxxxxxxxxxxx
-MONGODB_URI=mongodb://localhost:27017
+OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxxx
+OPENROUTER_MODEL=qwen/qwen3.6-plus-preview:free
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/?appName=Cluster0
 MONGODB_DB=megallm_blog_platform
 FLASK_ENV=development
 DEBUG=True
@@ -81,7 +84,7 @@ DEBUG=True
     with open(env_path) as f:
         env_content = f.read()
     
-    required_keys = ['MEGALLM_API_KEY', 'MONGODB_URI']
+    required_keys = ['OPENROUTER_API_KEY', 'MONGODB_URI']
     missing_keys = []
     
     for key in required_keys:
@@ -113,8 +116,8 @@ DEBUG=True
     return True
 
 def test_api_key():
-    """Test MegaLLM API key."""
-    print_header("Testing API Key")
+    """Test OpenRouter API key."""
+    print_header("Testing OpenRouter API Key")
     
     import os
     from dotenv import load_dotenv
@@ -122,13 +125,15 @@ def test_api_key():
     env_path = Path(__file__).parent.parent / ".env"
     load_dotenv(env_path)
     
-    api_key = os.getenv('MEGALLM_API_KEY') or os.getenv('OPENAI_API_KEY')
+    api_key = os.getenv('OPENROUTER_API_KEY')
+    model = os.getenv('OPENROUTER_MODEL', 'qwen/qwen3.6-plus-preview:free')
     
     if not api_key:
-        print("✗ No API key found")
+        print("✗ OPENROUTER_API_KEY not found in .env")
         return False
     
-    print(f"Testing key: {api_key[:20]}...")
+    print(f"Testing OpenRouter API key: {api_key[:20]}...")
+    print(f"Using model: {model}")
     
     try:
         import requests
@@ -139,10 +144,10 @@ def test_api_key():
         }
         
         response = requests.post(
-            'https://ai.megallm.io/v1/chat/completions',
+            'https://openrouter.ai/api/v1/chat/completions',
             headers=headers,
             json={
-                'model': 'deepseek-ai/deepseek-v3.1',
+                'model': model,
                 'messages': [{'role': 'user', 'content': 'ping'}],
                 'max_tokens': 10
             },
@@ -164,7 +169,7 @@ def test_api_key():
         return False
 
 def main():
-    print_header("MegaLLM Blog Generation Platform - Setup Check")
+    print_header("OpenRouter Blog Generation Platform - Setup Check")
     
     checks = [
         ("Requirements", check_requirements),

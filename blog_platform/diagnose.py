@@ -16,8 +16,9 @@ def diagnose():
     if not env_path.exists():
         print(f"   ✗ NOT FOUND: {env_path}")
         print("\n   CREATE THIS FILE WITH:")
-        print("   MEGALLM_API_KEY=sk-mega-your-key-here")
-        print("   MONGODB_URI=mongodb://localhost:27017")
+        print("   OPENROUTER_API_KEY=sk-or-v1-your-key-here")
+        print("   OPENROUTER_MODEL=qwen/qwen3.6-plus-preview:free")
+        print("   MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/?appName=Cluster0")
         print("   MONGODB_DB=megallm_blog_platform")
         return False
     else:
@@ -28,18 +29,18 @@ def diagnose():
     with open(env_path) as f:
         env_content = f.read()
     
-    if "MEGALLM_API_KEY" not in env_content:
-        print("   ✗ Missing MEGALLM_API_KEY")
+    if "OPENROUTER_API_KEY" not in env_content:
+        print("   ✗ Missing OPENROUTER_API_KEY")
         return False
     else:
         # Check if it's not empty
         for line in env_content.split('\n'):
-            if line.startswith('MEGALLM_API_KEY='):
+            if line.startswith('OPENROUTER_API_KEY='):
                 value = line.split('=', 1)[1].strip()
-                if value and value != 'sk-mega':
-                    print(f"   ✓ MEGALLM_API_KEY set")
+                if value and value != 'sk-or-v1':
+                    print(f"   ✓ OPENROUTER_API_KEY set")
                 else:
-                    print(f"   ✗ MEGALLM_API_KEY is empty or placeholder")
+                    print(f"   ✗ OPENROUTER_API_KEY is empty or placeholder")
                     return False
     
     # 3. Check Python imports
@@ -58,10 +59,13 @@ def diagnose():
     print("\n4. Checking MongoDB...")
     try:
         from pymongo import MongoClient
-        client = MongoClient('mongodb://localhost:27017', serverSelectionTimeoutMS=3000)
+        mongodb_uri = os.getenv('MONGODB_URI')
+        if not mongodb_uri:
+            raise ValueError("MONGODB_URI not set in .env")
+        client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=3000)
         client.admin.command('ping')
         client.close()
-        print("   ✓ MongoDB is running")
+        print("   ✓ MongoDB connected (Atlas)")
     except Exception as e:
         print(f"   ✗ MongoDB not running: {e}")
         print("\n   START MONGODB WITH:")

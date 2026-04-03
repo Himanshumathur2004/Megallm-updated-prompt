@@ -5,7 +5,7 @@
 ### ✓ Done (Already Prepared)
 - [x] MongoDB Atlas account set up
 - [x] MongoDB URI: `mongodb+srv://himanshu123:himanshu123@cluster0.ecqcp1z.mongodb.net/?appName=Cluster0`
-- [x] OpenRouter API Key: `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`
+- [x] OpenRouter API Key: `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`
 - [x] All code ready for deployment
 - [x] Environment variables configured locally
 
@@ -75,7 +75,7 @@ MONGODB_URI=mongodb+srv://himanshu123:himanshu123@cluster0.ecqcp1z.mongodb.net/?
 
 MONGODB_DB=megallm_blog_platform
 
-OPENROUTER_API_KEY=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
+OPENROUTER_API_KEY=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
 
 USE_OPENROUTER=true
 

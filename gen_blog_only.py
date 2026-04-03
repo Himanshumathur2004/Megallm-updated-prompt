@@ -44,7 +44,7 @@ args = parser.parse_args()
 if args.model:
     os.environ["WF2_MODEL"] = args.model
 
-db = MongoClient(os.getenv('MONGODB_URI', 'mongodb://localhost:27017'))[os.getenv('MONGODB_DB', 'megallm')]
+db = MongoClient(os.getenv('MONGODB_URI'))[os.getenv('MONGODB_DB', 'megallm')]
 collection = db.generated_posts
 
 # Get ALL pending insights

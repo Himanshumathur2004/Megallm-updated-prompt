@@ -4,7 +4,7 @@
 from wf3 import QualityControlPipeline, _build_config
 from pymongo import MongoClient
 
-db = MongoClient('mongodb://localhost:27017')['megallm']
+db = MongoClient(os.getenv('MONGODB_URI'))[os.getenv('MONGODB_DB', 'megallm')]
 
 # Get all draft post IDs
 post_ids = [str(doc['_id']) for doc in db.generated_posts.find({'status': 'draft'}, {'_id': 1})]

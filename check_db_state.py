@@ -7,7 +7,7 @@ from workflow_common import bootstrap_env
 
 bootstrap_env(__file__)
 
-client = MongoClient(os.getenv('MONGODB_URI', 'mongodb://localhost:27017'))
+client = MongoClient(os.getenv('MONGODB_URI'))
 db = client[os.getenv('MONGODB_DB', 'megallm')]
 
 print("=" * 60)

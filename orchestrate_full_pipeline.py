@@ -48,7 +48,7 @@ logger.info("=" * 80)
 # CONFIGURATION
 # ============================================================================
 
-MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+MONGODB_URI = os.getenv("MONGODB_URI")
 MONGODB_DB = os.getenv("MONGODB_DB", "megallm")
 ACCOUNTS = [
     {"id": "account_1", "name": "Account 1"},

@@ -2,7 +2,7 @@
 from pymongo import MongoClient
 
 import os
-db = MongoClient(os.getenv('MONGODB_URI', 'mongodb://localhost:27017'))[os.getenv('MONGODB_DB', 'megallm')]
+db = MongoClient(os.getenv('MONGODB_URI'))[os.getenv('MONGODB_DB', 'megallm')]
 
 # Count posts by type
 pipeline = [{'$group': {'_id': '$type', 'count': {'$sum': 1}}}]

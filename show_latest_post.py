@@ -3,7 +3,7 @@
 from pymongo import MongoClient
 import json
 
-db = MongoClient('mongodb://localhost:27017')['megallm']
+db = MongoClient(os.getenv('MONGODB_URI'))[os.getenv('MONGODB_DB', 'megallm')]
 
 # Get the latest generated post
 latest = db.generated_posts.find_one(sort=[('_id', -1)])

@@ -178,6 +178,11 @@ class Database:
     def __init__(self, uri: str, db_name: str):
         self.is_memory = False
         try:
+            # Log connection attempt
+            logger.info(f"Attempting MongoDB connection...")
+            logger.info(f"URI starts with: {uri[:30] if uri else 'NONE'}...")
+            logger.info(f"Database: {db_name}")
+            
             self.client = MongoClient(uri, serverSelectionTimeoutMS=5000, connectTimeoutMS=10000)
             # Verify connection
             self.client.admin.command('ping')
@@ -185,8 +190,8 @@ class Database:
             self._init_collections()
             logger.info("✓ Connected to MongoDB")
         except Exception as e:
-            logger.warning(f"MongoDB connection failed: {e}")
-            logger.info("Falling back to in-memory storage...")
+            logger.error(f"✗ MongoDB connection FAILED: {type(e).__name__}: {str(e)[:200]}")
+            logger.warning(f"FALLING BACK TO IN-MEMORY DATABASE (data will be lost on restart!)")
             self._fallback = InMemoryDatabase()
             self.is_memory = True
     

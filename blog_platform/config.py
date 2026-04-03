@@ -15,7 +15,10 @@ class Config:
     # MongoDB - Use MONGODB_URI from .env (Atlas)
     MONGODB_URI = os.getenv("MONGODB_URI")
     if not MONGODB_URI:
-        raise ValueError("MONGODB_URI environment variable must be set in .env file. Use MongoDB Atlas connection string.")
+        print("\n❌ CRITICAL: MONGODB_URI not set in environment!")
+        print("   On Render: Set MONGODB_URI in environment variables")
+        print("   Locally: Set in .env file")
+        raise ValueError("MONGODB_URI environment variable must be set")
     MONGODB_DB = os.getenv("MONGODB_DB", "megallm_blog_platform")
     
     # OpenRouter API Configuration (Primary)

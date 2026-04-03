@@ -3,7 +3,7 @@
 
 from pymongo import MongoClient
 
-db = MongoClient('mongodb://localhost:27017')['megallm']
+db = MongoClient(os.getenv('MONGODB_URI'))[os.getenv('MONGODB_DB', 'megallm')]
 
 print('=' * 90)
 print('CONTENT INSIGHTS CREATED BY WF1')

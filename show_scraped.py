@@ -3,7 +3,7 @@
 
 from pymongo import MongoClient
 
-db = MongoClient('mongodb://localhost:27017')['megallm']
+db = MongoClient(os.getenv('MONGODB_URI'))[os.getenv('MONGODB_DB', 'megallm')]
 
 # First, let's check the latest articles by date
 articles = db.articles.find().sort('isoDate', -1).limit(5)

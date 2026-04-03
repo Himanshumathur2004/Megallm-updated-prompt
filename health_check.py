@@ -12,7 +12,7 @@ print("="*80 + "\n")
 # 1. MongoDB
 print("[1] MongoDB Connection")
 try:
-    c = MongoClient(os.getenv('MONGODB_URI', 'mongodb://localhost:27017'), serverSelectionTimeoutMS=3000)
+    c = MongoClient(os.getenv('MONGODB_URI'), serverSelectionTimeoutMS=3000)
     c.admin.command('ping')
     articles = c['megallm'].articles.count_documents({})
     blogs = c['megallm'].blogs.count_documents({})
@@ -79,7 +79,7 @@ except Exception as e:
 # 6. Latest Data
 print("\n[6] Latest Data")
 try:
-    c = MongoClient(os.getenv('MONGODB_URI', 'mongodb://localhost:27017'))
+    c = MongoClient(os.getenv('MONGODB_URI'))
     db = c[os.getenv('MONGODB_DB', 'megallm')]
     
     # Latest blogs per account

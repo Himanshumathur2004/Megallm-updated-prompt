@@ -28,7 +28,8 @@ for model in models:
     # Update .env
     env_content = f'''MEGALLM_API_KEY={api_key}
 OPENAI_API_KEY={api_key}
-MONGODB_URI=mongodb://localhost:27017
+# Use MONGODB_URI from .env (Atlas)
+# MONGODB_URI format: mongodb+srv://user:pass@cluster.mongodb.net/dbname
 MONGODB_DB=megallm
 WF2_MODEL={model}
 OPENAI_MODEL={model}'''

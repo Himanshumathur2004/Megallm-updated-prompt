@@ -1062,3 +1062,73 @@ blog_generator type: <class 'blog_generator.BlogGenerator'>
       keys: ['title', 'body']
 Generated 12 blogs, error: None
 === END ENDPOINT ===
+
+=== ENDPOINT CALLED at 2026-04-03T21:52:57.130959 ===
+account_id: account_1
+topics_to_generate: None
+blog_generator type: <class 'blog_generator.BlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: False
+
+=== ENDPOINT CALLED at 2026-04-03T21:54:59.925394 ===
+account_id: account_2
+topics_to_generate: None
+blog_generator type: <class 'blog_generator.BlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: False
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+      generate_blog() returned OK: False
+  Processing topic: reliability
+
+=== ENDPOINT CALLED at 2026-04-03T23:32:49.314214 ===
+account_id: account_1
+topics_to_generate: {'cost_optimization': 1, 'performance': 1, 'reliability': 1, 'infrastructure': 1}
+blog_generator type: <class 'blog_generator.BlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: infrastructure
+
+=== ENDPOINT CALLED at 2026-04-03T23:37:51.464917 ===
+account_id: account_1
+topics_to_generate: {'cost_optimization': 1, 'performance': 1, 'reliability': 1, 'infrastructure': 1}
+blog_generator type: <class 'blog_generator.BlogGenerator'>
+  Processing topic: cost_optimization
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+Generated 4 blogs, error: None
+=== END ENDPOINT ===
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: performance
+      generate_blog() returned OK: True
+      keys: ['title', 'body']
+  Processing topic: reliability

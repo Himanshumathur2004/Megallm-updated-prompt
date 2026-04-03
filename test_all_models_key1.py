@@ -28,7 +28,7 @@ for model in models:
     # Update .env
     env_content = f'''MEGALLM_API_KEY={api_key}
 OPENAI_API_KEY={api_key}
-MONGODB_URI=mongodb://localhost:27017
+MONGODB_URI={os.getenv('MONGODB_URI', 'mongodb+srv://user:pass@cluster.mongodb.net/dbname')}
 MONGODB_DB=megallm
 WF2_MODEL={model}
 OPENAI_MODEL={model}'''
@@ -81,7 +81,7 @@ if working:
     print(f'\n✓ Using working model: {working[0]}')
     Path('.env').write_text(f'''MEGALLM_API_KEY={api_key}
 OPENAI_API_KEY={api_key}
-MONGODB_URI=mongodb://localhost:27017
+MONGODB_URI={os.getenv('MONGODB_URI', 'mongodb+srv://user:pass@cluster.mongodb.net/dbname')}
 MONGODB_DB=megallm
 WF2_MODEL={working[0]}
 OPENAI_MODEL={working[0]}''')

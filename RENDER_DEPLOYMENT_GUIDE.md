@@ -87,7 +87,7 @@ Value: mongodb+srv://himanshu123:himanshu123@cluster0.ecqcp1z.mongodb.net/?appNa
 ### Variable 2: OpenRouter API
 ```
 Key: OPENROUTER_API_KEY
-Value: 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
+Value: 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
 ```
 
 ### Variable 3: MongoDB Database Name

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-MegaLLM Content Intelligence Pipeline
+OpenRouter Content Intelligence Pipeline
 Replaces n8n workflow with Python implementation
-Uses MegaLLM API (OpenAI-compatible) at https://ai.megallm.io/v1
+Uses OpenRouter API (OpenAI-compatible) at https://openrouter.ai/api/v1
 """
 
 import os
@@ -34,17 +34,17 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class Config:
-    # MegaLLM API (OpenAI-compatible)
-    openai_api_key: str = field(default_factory=lambda: os.getenv("MEGALLM_API_KEY", ""))  # or OPENAI_API_KEY
-    openai_base_url: str = "https://ai.megallm.io/v1"
+    # OpenRouter API (OpenAI-compatible)
+    openai_api_key: str = field(default_factory=lambda: os.getenv("OPENROUTER_API_KEY", ""))  # or OPENAI_API_KEY
+    openai_base_url: str = "https://openrouter.ai/api/v1"
     openai_model: str = field(
         default_factory=lambda: os.getenv(
-            "WF1_OPENAI_MODEL", os.getenv("OPENAI_MODEL", "deepseek-ai/deepseek-v3.1")
+            "WF1_OPENAI_MODEL", os.getenv("OPENROUTER_MODEL", "qwen/qwen3.6-plus-preview:free")
         )
     )
 
     # MongoDB
-    mongodb_uri: str = field(default_factory=lambda: os.getenv("MONGODB_URI", "mongodb://localhost:27017"))
+    mongodb_uri: str = field(default_factory=lambda: os.getenv("MONGODB_URI"))
     mongodb_db: str = field(default_factory=lambda: os.getenv("MONGODB_DB", "megallm"))
     scrape_run_id: str = field(default_factory=lambda: os.getenv("WF1_SCRAPE_RUN_ID", ""))
 
@@ -55,7 +55,7 @@ class Config:
     # Processing
     batch_size: int = 10
     dedup_threshold: float = 0.85
-    icp_threshold: float = 6.5
+    icp_threshold: float = 3.0
     max_articles: int = 200
 
     # FIX 3: Mutable default (dict) in dataclass must use field(default_factory=...)
@@ -88,10 +88,10 @@ class Config:
 
 
 # ============================================================================
-# MEGALLM API CLIENT (OpenAI-compatible)
+# OPENROUTER API CLIENT (OpenAI-compatible)
 # ============================================================================
 
-class MegaLLMClient:
+class OpenRouterClient:
     def __init__(self, api_key: str, base_url: str, model: str = "gpt-4o-mini"):
         self.api_key = api_key
         self.base_url = base_url.rstrip('/')
@@ -103,7 +103,7 @@ class MegaLLMClient:
 
     def chat_completion(self, system_prompt: str, user_prompt: str,
                         temperature: float = 0.7, max_tokens: int = 600) -> str:
-        """Make MegaLLM API request (OpenAI-compatible endpoint)."""
+        """Make OpenRouter API request (OpenAI-compatible endpoint)."""
         url = f"{self.base_url}/chat/completions"
 
         payload = {
@@ -122,7 +122,7 @@ class MegaLLMClient:
             data = response.json()
             return data["choices"][0]["message"]["content"]
         except requests.exceptions.HTTPError as e:
-            logger.error(f"MegaLLM API error: {e}")
+            logger.error(f"OpenRouter API error: {e}")
             if e.response is not None:
                 body = e.response.text
                 logger.error(f"Response: {body}")
@@ -130,7 +130,7 @@ class MegaLLMClient:
                     raise LLMQuotaExceededError(body) from e
             raise
         except requests.exceptions.RequestException as e:
-            logger.error(f"MegaLLM API error: {e}")
+            logger.error(f"OpenRouter API error: {e}")
             # FIX 4: e.response may be None; guard before accessing .text
             if hasattr(e, 'response') and e.response is not None:
                 logger.error(f"Response: {e.response.text}")
@@ -138,7 +138,7 @@ class MegaLLMClient:
 
     def generate_angle(self, article: Dict) -> Dict[str, Any]:
         """Generate content angle for article."""
-        system_prompt = """You are a senior AI content strategist for MegaLLM, an LLM inference API platform.
+        system_prompt = """You are a senior AI content strategist for technology companies.
     Your job is to transform each input article into one sharp, high-conviction content angle for technical decision-makers.
 
     CONTEXT: WHO YOU ARE WRITING FOR
@@ -153,13 +153,14 @@ class MegaLLMClient:
     Maximizing production reliability and uptime
     Meeting compliance and data-residency requirements
     Preserving model optionality (avoiding vendor lock-in)
-    MEGALLM POSITIONING (USE WHEN RELEVANT)
 
-    Cost: up to 70% cheaper than OpenAI for comparable workloads
-    Speed: sub-100ms p50 latency on key model paths
-    Reliability: 99.99% uptime with automatic failover
-    Flexibility: 50+ models through one API
-    Compliance: SOC2, GDPR alignment, regional data processing
+    OPENROUTER POSITIONING (USE WHEN RELEVANT)
+
+    Cost: Free tier with fair usage
+    Speed: Fast inference with multiple model options
+    Reliability: Stable API service
+    Flexibility: 100+ models through one API
+    Compliance: Privacy-focused, no data training
     INPUT
     Title: {{ $json.title || 'N/A' }}
     Summary: {{ $json.contentSnippet || 'N/A' }}
@@ -171,7 +172,7 @@ class MegaLLMClient:
 
     Frames the article through a startup CTO lens
     Surfaces a decision-relevant technical or business implication
-    Connects that implication to one concrete MegaLLM advantage
+    Connects that implication to one concrete OpenRouter advantage
     Includes one quantitative infrastructure data point
     ALLOWED angle_type VALUES
 
@@ -473,7 +474,7 @@ def generate_mock_embedding(text: str, dim: int = 1536) -> List[float]:
 class ContentIntelligencePipeline:
     def __init__(self, config: Config):
         self.config = config
-        self.llm = MegaLLMClient(
+        self.llm = OpenRouterClient(
             api_key=config.openai_api_key,
             base_url=config.openai_base_url,
             model=config.openai_model
@@ -636,7 +637,7 @@ class ContentIntelligencePipeline:
     def run(self):
         """Run the full pipeline."""
         logger.info("Starting Content Intelligence Pipeline")
-        logger.info(f"Using MegaLLM API: {self.config.openai_base_url}")
+        logger.info(f"Using OpenRouter API: {self.config.openai_base_url}")
         logger.info(f"Model: {self.config.openai_model}")
 
         articles = self.fetch_pending_articles()
@@ -722,7 +723,7 @@ def run_pipeline():
     env_path = Path('.env')
     if env_path.exists():
         for line in env_path.read_text(encoding='utf-8').splitlines():
-            if line.startswith('MEGALLM_API_KEY='):
+            if line.startswith('OPENROUTER_API_KEY='):
                 api_key = line.split('=', 1)[1].strip().strip('"\'')
                 break
             if line.startswith('OPENAI_API_KEY='):
@@ -734,9 +735,9 @@ def run_pipeline():
         api_key = resolve_api_key()
     
     if not api_key:
-        logger.error("MEGALLM_API_KEY or OPENAI_API_KEY not found")
+        logger.error("OPENROUTER_API_KEY or OPENAI_API_KEY not found")
         logger.error("Set one of the following and re-run:")
-        logger.error("  export MEGALLM_API_KEY='your_api_key_here'")
+        logger.error("  export OPENROUTER_API_KEY='sk-or-v1-...'")
         logger.error("  # or")
         logger.error("  export OPENAI_API_KEY='your_api_key_here'")
         logger.error("You can also create a .env file in this folder with either key.")

@@ -131,7 +131,7 @@ print("\n✓ Checking MongoDB connection...")
 try:
     from pymongo import MongoClient
     
-    mongodb_uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+    mongodb_uri = os.getenv("MONGODB_URI")
     mongodb_db = os.getenv("MONGODB_DB", "megallm")
     
     try:
@@ -178,7 +178,7 @@ print("\n✓ Checking MongoDB collections...")
 try:
     from pymongo import MongoClient
     
-    mongodb_uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+    mongodb_uri = os.getenv("MONGODB_URI")
     mongodb_db = os.getenv("MONGODB_DB", "megallm")
     
     client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=5000)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MegaLLM WF2 – Content Generation Pipeline
+OpenRouter WF2 – Content Generation Pipeline
 Triggered by WF1 with a content_insight_id.
 Generates LinkedIn (A/B), Twitter/X (A/B), Blog, and Newsletter content.
 Stores all drafts in generated_posts, then fires WF3 webhook.
@@ -48,17 +48,17 @@ class InsightNotFoundError(Exception):
 
 @dataclass
 class WF2Config:
-    # MegaLLM / OpenAI-compatible
-    api_key: str = field(default_factory=lambda: os.getenv("MEGALLM_API_KEY", os.getenv("OPENAI_API_KEY", "sk-mega-6c309f77db9167850e784c25d8f8f93b672b2173b4dd791aa5c31a5ff6bd4329")))
-    api_base_url: str = "https://ai.megallm.io/v1"
+    # OpenRouter / OpenAI-compatible
+    api_key: str = field(default_factory=lambda: os.getenv("OPENROUTER_API_KEY", os.getenv("OPENAI_API_KEY", "")))
+    api_base_url: str = "https://openrouter.ai/api/v1"
     model: str = field(
         default_factory=lambda: os.getenv(
-            "WF2_MODEL", os.getenv("OPENAI_MODEL", "deepseek-ai/deepseek-v3.1")
+            "WF2_MODEL", os.getenv("OPENROUTER_MODEL", "qwen/qwen3.6-plus-preview:free")
         )
     )
 
     # MongoDB
-    mongodb_uri: str = field(default_factory=lambda: os.getenv("MONGODB_URI", "mongodb://localhost:27017"))
+    mongodb_uri: str = field(default_factory=lambda: os.getenv("MONGODB_URI"))
     mongodb_db: str = field(default_factory=lambda: os.getenv("MONGODB_DB", "megallm"))
 
     # Serper (SEO brief)

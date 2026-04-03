@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MegaLLM WF3 – Quality Control Pipeline
+OpenRouter WF3 – Quality Control Pipeline
 Triggered by WF2 with a list of generated_post_ids.
 Scores each post, rewrites if 5–6.9, shelves if < 5 or still < 7 after rewrite.
 Approved posts trigger WF4. Shelved posts notify Slack #content-ops.
@@ -39,16 +39,16 @@ logger = logging.getLogger(__name__)
 class WF3Config:
     # Scorer model — cheaper, high-volume
     scorer_api_key: str = ""
-    scorer_base_url: str = "https://ai.megallm.io/v1"
-    scorer_model: str = field(default_factory=lambda: os.getenv("WF3_SCORER_MODEL", "deepseek-ai/deepseek-v3.1"))
+    scorer_base_url: str = "https://openrouter.ai/api/v1"
+    scorer_model: str = field(default_factory=lambda: os.getenv("WF3_SCORER_MODEL", "qwen/qwen3.6-plus-preview:free"))
 
     # Rewrite model — consistent voice with WF2
     rewrite_api_key: str = ""
-    rewrite_base_url: str = "https://ai.megallm.io/v1"
-    rewrite_model: str = field(default_factory=lambda: os.getenv("WF3_REWRITE_MODEL", "deepseek-ai/deepseek-v3.1"))
+    rewrite_base_url: str = "https://openrouter.ai/api/v1"
+    rewrite_model: str = field(default_factory=lambda: os.getenv("WF3_REWRITE_MODEL", "qwen/qwen3.6-plus-preview:free"))
 
     # MongoDB
-    mongodb_uri: str = field(default_factory=lambda: os.getenv("MONGODB_URI", "mongodb://localhost:27017"))
+    mongodb_uri: str = field(default_factory=lambda: os.getenv("MONGODB_URI"))
     mongodb_db: str = field(default_factory=lambda: os.getenv("MONGODB_DB", "megallm"))
 
     # Slack

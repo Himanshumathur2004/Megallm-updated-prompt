@@ -125,7 +125,7 @@ def scrape_new_articles(limit: int = 0) -> dict:
     bootstrap_env(__file__)
     
     # Use environment variables for MongoDB connection
-    mongodb_uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+    mongodb_uri = os.getenv("MONGODB_URI")
     mongodb_db = os.getenv("MONGODB_DB", "megallm")
     
     client = MongoClient(mongodb_uri)

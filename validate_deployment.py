@@ -92,7 +92,7 @@ except Exception as e:
 print("\n[5] Checking MongoDB connection...")
 try:
     from pymongo import MongoClient
-    mongo_uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+    mongo_uri = os.getenv("MONGODB_URI")
     client = MongoClient(mongo_uri, serverSelectionTimeoutMS=3000)
     client.admin.command('ping')
     db_name = os.getenv("MONGODB_DB", "megallm_blog_platform")

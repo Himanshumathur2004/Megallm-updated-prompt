@@ -27,9 +27,9 @@ class BlogManager:
     def __init__(self):
         self.db = Database(Config.MONGODB_URI, Config.MONGODB_DB)
         self.generator = BlogGenerator(
-            Config.MEGALLM_API_KEY,
-            Config.MEGALLM_BASE_URL,
-            Config.MEGALLM_MODEL
+            Config.OPENROUTER_API_KEY,
+            Config.OPENROUTER_BASE_URL,
+            Config.OPENROUTER_MODEL
         )
     
     def list_accounts(self):
@@ -201,7 +201,7 @@ class BlogManager:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='MegaLLM Blog Generation Platform - CLI Manager',
+        description='OpenRouter Blog Generation Platform - CLI Manager',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
