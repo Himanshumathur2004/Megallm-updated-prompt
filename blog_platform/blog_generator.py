@@ -4,7 +4,6 @@ import json
 import logging
 from typing import Dict, Optional
 import requests
-import random
 
 logger = logging.getLogger(__name__)
 
@@ -35,35 +34,20 @@ class BlogGenerator:
         Returns:
             {"title": str, "body": str} or None on error
         """
-        # Randomly decide whether to mention MegaLLM in the title (30% chance)
-        mention_megallm_in_title = random.random() < 0.3
-        
-        title_instruction = (
-            "should mention MegaLLM in the title"
-            if mention_megallm_in_title
-            else "title should focus on the problem/solution WITHOUT mentioning MegaLLM - make it sound like organic technical content"
-        )
-        
-        system_prompt = f"""You are a technical content writer writing for a tech blog.
-
-MegaLLM Context (use only in body, not always):
-- MegaLLM is a unified LLM router and optimization platform
-- It helps CTOs and AI teams reduce costs, improve performance, and ensure reliability
-- MegaLLM provides multi-model support, automatic failover, and intelligent routing
-- Target audience: CTOs at AI startups building LLM-powered applications
+        system_prompt = f"""You are a technical content writer writing for a tech blog about LLM and AI topics.
 
 Write a blog post about: {topic}
 
 Description: {topic_description}
 
 Requirements:
-- Title: max 10 words, {title_instruction}
+- Title: max 10 words, should focus on the technical problem/solution (NO brand mentions)
 - Body: {word_count_min}-{word_count_max} words
 - Focus on: The problem, solution approaches, best practices
 - Include: Practical examples, specific metrics, or real-world scenarios
-- Optional: Can mention MegaLLM in body if relevant to the discussion
+- Optional: In the description or body, you may optionally mention how tools like unified LLM routers can help with cost optimization, performance improvement, or reliability (keep this minimal and natural)
 - Use simple, clear technical language
-- Target CTOs at AI startups
+- Target CTOs and AI engineers at startups
 
 Return ONLY valid JSON (no markdown):
 {{
@@ -71,7 +55,7 @@ Return ONLY valid JSON (no markdown):
   "body": "Your blog post here..."
 }}"""
         
-        user_prompt = f"""Write a technical blog post for CTOs about:
+        user_prompt = f"""Write a technical blog post for CTOs and AI engineers about:
 Topic: {topic}
 Key points: {', '.join(keywords)}
 
@@ -80,10 +64,15 @@ IMPORTANT: This blog should:
 2. Discuss practical solutions and best practices
 3. Include specific benefits or tradeoffs
 4. Provide actionable tips or examples
-5. Be relevant to AI startups building with LLMs
-6. Sound natural and informative (not promotional)
+5. Sound natural and informative (focus on technical value, not promotion)
+6. Title must NOT mention any brands or tools - focus on the technical solution
 
-{'Note: You may mention MegaLLM in the body if it fits the discussion naturally.' if not mention_megallm_in_title else ''}
+Optionally, if relevant to the discussion, you may briefly mention how unified LLM routers or multi-model platforms help with:
+- Cost: Reducing inference costs through smart model selection
+- Performance: Optimizing latency and throughput
+- Reliability: Automatic failover and model fallback strategies
+
+Keep any such mentions minimal and integrated naturally into the narrative.
 
 Return valid JSON with title and body fields only."""
 
