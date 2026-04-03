@@ -68,19 +68,25 @@ if blog_generator is None:
 
 # Initialize accounts on startup
 def init_accounts():
-    """Create accounts if they don't exist."""
+    """Create accounts if they don't exist, or update if names changed."""
     created = 0
-    existing = 0
+    updated = 0
     
     for account in Config.ACCOUNTS:
-        if db.get_account(account["id"]):
-            existing += 1
+        existing_account = db.get_account(account["id"])
+        if existing_account:
+            # Check if name or description changed
+            if existing_account.get("name") != account["name"] or existing_account.get("description") != account["description"]:
+                # Update the account with new name/description
+                db.update_account(account["id"], account["name"], account["description"])
+                updated += 1
         else:
+            # Create new account
             if db.create_account(account["id"], account["name"], account["description"]):
                 created += 1
     
-    if created > 0:
-        logger.info(f"Accounts: {created} created, {existing} existing")
+    if created > 0 or updated > 0:
+        logger.info(f"Accounts: {created} created, {updated} updated")
 
 init_accounts()
 

@@ -242,6 +242,25 @@ class Database:
             logger.error(f"Error creating account {account_id}: {e}")
             return False
     
+    def update_account(self, account_id: str, name: str, description: str = "") -> bool:
+        """Update an existing account's name and description."""
+        if self.is_memory:
+            if account_id in self._fallback.accounts:
+                self._fallback.accounts[account_id]["name"] = name
+                self._fallback.accounts[account_id]["description"] = description
+                return True
+            return False
+        
+        try:
+            result = self.db.accounts.update_one(
+                {"account_id": account_id},
+                {"$set": {"name": name, "description": description}}
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            logger.error(f"Error updating account {account_id}: {e}")
+            return False
+    
     # ========== BLOG MANAGEMENT ==========
     
     def get_blogs_by_account(
@@ -427,12 +446,15 @@ class Database:
         # Get recent blogs
         recent_blogs = self.get_blogs_by_account(account_id, limit=5)
         
+        # Filter out None topic keys for JSON serialization
+        blogs_by_topic = {str(item["_id"]): item["count"] for item in topic_counts if item["_id"] is not None}
+        
         return {
             "account": account,
             "total_blogs": account.get("blog_count", 0),
             "posted_blogs": status_counts.get("posted", 0),
             "draft_blogs": status_counts.get("draft", 0),
             "status_breakdown": status_counts,
-            "blogs_by_topic": {item["_id"]: item["count"] for item in topic_counts},
+            "blogs_by_topic": blogs_by_topic,
             "recent_blogs": recent_blogs,
         }
