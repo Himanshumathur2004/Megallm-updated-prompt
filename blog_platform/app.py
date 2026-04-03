@@ -200,18 +200,13 @@ def test_endpoint():
 @app.route("/api/diagnostic", methods=["GET"])
 def diagnostic():
     """Diagnostic endpoint to check database and config status."""
-    import os
-    
-    mongodb_uri = os.getenv("MONGODB_URI", "NOT SET")
-    mongodb_uri_masked = mongodb_uri[:50] + "..." if len(mongodb_uri) > 50 else mongodb_uri
-    
+    # IMPORTANT: Never expose MongoDB URI or credentials!
     return jsonify({
         "database": {
             "type": "in-memory" if db.is_memory else "MongoDB",
-            "mongodb_uri": mongodb_uri_masked if mongodb_uri != "NOT SET" else "NOT SET",
-            "db_name": Config.MONGODB_DB,
+            "is_connected": not db.is_memory,
             "is_memory_fallback": db.is_memory,
-            "warning": "USING IN-MEMORY DATABASE - DATA WILL BE LOST ON RESTART!" if db.is_memory else "Using MongoDB Atlas"
+            "warning": "USING IN-MEMORY DATABASE - DATA WILL BE LOST ON RESTART!" if db.is_memory else "✓ MongoDB connected"
         },
         "config": {
             "openrouter_configured": bool(Config.OPENROUTER_API_KEY),
