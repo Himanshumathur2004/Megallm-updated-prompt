@@ -91,7 +91,6 @@
 
         <div class="controls">
             <button class="btn btn-primary" onclick="bulkGenerateAll()">⚡ Bulk Generate (All Accounts)</button>
-            <button class="btn btn-primary" onclick="generateBlogsNow()">🚀 Generate Blogs Now</button>
             <button class="btn btn-secondary" onclick="refreshDashboard()">🔄 Refresh</button>
             <button class="btn btn-secondary" onclick="showClearModal()">🗑️ Clear Blogs</button>
         </div>
@@ -285,33 +284,6 @@
                 console.error('Failed to copy:', err);
                 showToast('Error copying', 'error');
             });
-        }
-
-        async function generateBlogsNow() {
-            if (!currentAccount) return;
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '⏳ Generating...';
-            try {
-                const response = await fetch(`${API_BASE}/blogs/generate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ account_id: currentAccount })
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    showToast(`✅ Generated ${data.generated_count} blogs!`, 'success');
-                    await refreshDashboard();
-                } else {
-                    showToast(`⚠️ ${data.error || 'Generation failed'}`, 'error');
-                }
-            } catch (err) {
-                console.error('Error generating blogs:', err);
-                showToast('Error generating blogs', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🚀 Generate Blogs Now';
-            }
         }
 
         async function bulkGenerateAll() {
