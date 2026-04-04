@@ -134,6 +134,8 @@ Return valid JSON with title and body fields only."""
             return None
         except Exception as e:
             logger.error(f"Blog generation error: {type(e).__name__}: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return None
     
     def batch_generate(

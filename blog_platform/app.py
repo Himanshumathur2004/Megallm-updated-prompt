@@ -492,6 +492,63 @@ def get_insights():
     }), 200
 
 
+@app.route("/api/insights/generate-blogs", methods=["POST"])
+def generate_blogs_from_insights():
+    """
+    Generate blog posts from insights for selected accounts.
+    
+    Request body:
+    {
+        "accounts": ["account_1", "account_2", ...]  // accounts to generate for (optional)
+    }
+    
+    Response:
+    {
+        "success": true,
+        "total_blogs": 45,
+        "articles_scraped": 15,
+        "accounts": {
+            "account_1": 15,
+            "account_2": 15,
+            ...
+        }
+    }
+    """
+    if not blog_generator:
+        return jsonify({
+            "error": "Blog generator not initialized",
+            "message": "Check .env configuration and API key",
+            "success": False,
+            "total_blogs": 0,
+            "articles_scraped": 0
+        }), 500
+    
+    try:
+        data = request.get_json() or {}
+        accounts = data.get("accounts")
+        
+        # Call insight-driven generation
+        result = generate_blogs_from_insights_now(
+            db=db,
+            generator=blog_generator,
+            mongodb_uri=Config.MONGODB_URI,
+            mongodb_db=Config.MONGODB_DB,
+            accounts=accounts
+        )
+        
+        return jsonify(result), 200 if result.get("success") else 500
+    
+    except Exception as e:
+        logger.error(f"Error generating blogs from insights: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "total_blogs": 0,
+            "articles_scraped": 0,
+            "accounts": {}
+        }), 500
+
+
 @app.route("/api/articles", methods=["GET"])
 def get_articles():
     """Get articles (currently just returns empty for frontend compatibility)."""

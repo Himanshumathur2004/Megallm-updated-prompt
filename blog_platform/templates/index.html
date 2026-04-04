@@ -656,8 +656,11 @@
         </div>
 
         <div class="controls">
-            <button class="btn btn-primary" onclick="generateBlogsNow()" style="font-size: 15px;">
+            <button class="btn btn-primary" id="generateBtn" onclick="generateBlogsNow()" style="font-size: 15px;">
                 <span id="generateBtnText">🚀 Generate Blogs Now</span>
+            </button>
+            <button class="btn" id="stopBtn" onclick="stopGeneration()" style="font-size: 15px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; box-shadow: 0 10px 20px rgba(249, 115, 22, 0.2); display: none;">
+                ⏹️ Stop Generation
             </button>
             <button class="btn btn-primary" onclick="showViewBlogsModal()" style="font-size: 15px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);">
                 📚 View Blogs by Account
@@ -798,6 +801,7 @@
         let currentAccount = null;
         let currentFilter = 'all';
         let blogs = [];
+        let currentPollInterval = null;  // Store polling interval for stopping
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1031,13 +1035,36 @@
             }
         }
 
+        // Stop blog generation
+        function stopGeneration() {
+            if (currentPollInterval) {
+                clearInterval(currentPollInterval);
+                currentPollInterval = null;
+            }
+            
+            const btn = document.getElementById('generateBtnText');
+            const generateBtn = document.getElementById('generateBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            
+            btn.textContent = '🚀 Generate Blogs Now';
+            generateBtn.disabled = false;
+            stopBtn.style.display = 'none';
+            
+            showToast('⏹️ Generation stopped', 'warning');
+        }
+
         // Generate blogs now - runs complete pipeline (scrape → analyze → generate)
         // With real-time polling to show blogs immediately as they're generated
         async function generateBlogsNow() {
             const btn = document.getElementById('generateBtnText');
+            const generateBtn = document.getElementById('generateBtn');
+            const stopBtn = document.getElementById('stopBtn');
             const originalText = btn.textContent;
             btn.innerHTML = '<span class="loading"></span> Pipeline running...';
-            btn.disabled = true;
+            generateBtn.disabled = true;
+            
+            // Show stop button
+            stopBtn.style.display = 'inline-block';
 
             try {
                 showToast('Starting complete pipeline: Scrape → Analyze → Generate...', 'info');
@@ -1051,84 +1078,67 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    showToast(`✅ Pipeline complete! Generated ${data.total_blogs_generated} blogs`, 'success');
+                    showToast('⏳ Generation started in background...', 'success');
+                    showToast('📚 Blogs will appear in the library shortly as they are generated (typically 1-5 minutes)', 'info');
                     
-                    // Show detailed results
-                    const scrape = data.steps.scrape;
-                    const insights = data.steps.insights;
-                    const gen = data.steps.generation;
-                    
-                    const details = `
-                        📰 Scraped: ${scrape.inserted || 0} articles
-                        🧠 Analyzed: ${insights.insights_created || 0} insights
-                        📝 Generated: ${gen.total_blogs || 0} blogs
-                    `;
-                    showToast(details, 'success');
-                    
-                    // Poll for new blogs immediately - check every 200ms for up to 30 seconds
+                    // Poll for new blogs immediately - check every 500ms for up to 10 minutes
                     // This shows blogs in the library as soon as they're generated
                     let pollingCount = 0;
-                    const maxPolls = 150; // 30 seconds (150 * 200ms)
+                    const maxPolls = 1200; // 10 minutes (1200 * 500ms)
                     const initialBlogCount = blogs.length;
+                    let hasNotifiedUser = false;
                     
-                    const pollInterval = setInterval(async () => {
+                    currentPollInterval = setInterval(async () => {
                         pollingCount++;
                         try {
                             await loadBlogs();
                             await refreshDashboard();
                             
-                            // If blogs have been added, stop polling
+                            // If blogs have been added, stop polling and notify
                             if (blogs.length > initialBlogCount) {
-                                clearInterval(pollInterval);
-                                showToast('✅ New blogs are now visible in the library!', 'success');
+                                clearInterval(currentPollInterval);
+                                currentPollInterval = null;
+                                const newBlogCount = blogs.length - initialBlogCount;
+                                showToast(`✅ ${newBlogCount} new blog(s) generated and visible in the library!`, 'success');
+                                hasNotifiedUser = true;
+                                
+                                // Re-enable button now that generation completed
+                                btn.textContent = originalText;
+                                generateBtn.disabled = false;
+                                stopBtn.style.display = 'none';
                             }
                             
                             // Stop after max polls
                             if (pollingCount >= maxPolls) {
-                                clearInterval(pollInterval);
+                                clearInterval(currentPollInterval);
+                                currentPollInterval = null;
+                                if (!hasNotifiedUser) {
+                                    showToast('⏱️ Generation is taking longer than expected. Check the Generation Log for details.', 'warning');
+                                }
+                                
+                                // Re-enable button after timeout
+                                btn.textContent = originalText;
+                                generateBtn.disabled = false;
+                                stopBtn.style.display = 'none';
                             }
                         } catch (err) {
                             console.error('Error during polling:', err);
                         }
-                    }, 200);
+                    }, 500);
                 } else {
-                    showToast(`⚠️ Pipeline completed with issues: ${data.error || data.message}`, 'error');
-                    
-                    // Still show what was generated
-                    if (data.total_blogs_generated > 0) {
-                        showToast(`Generated ${data.total_blogs_generated} blogs despite errors`, 'warning');
-                        
-                        // Poll for any generated blogs
-                        let pollingCount = 0;
-                        const maxPolls = 150;
-                        const initialBlogCount = blogs.length;
-                        
-                        const pollInterval = setInterval(async () => {
-                            pollingCount++;
-                            try {
-                                await loadBlogs();
-                                await refreshDashboard();
-                                
-                                if (blogs.length > initialBlogCount) {
-                                    clearInterval(pollInterval);
-                                    showToast('✅ Generated blogs are now visible!', 'success');
-                                }
-                                
-                                if (pollingCount >= maxPolls) {
-                                    clearInterval(pollInterval);
-                                }
-                            } catch (err) {
-                                console.error('Error during polling:', err);
-                            }
-                        }, 200);
-                    }
+                    showToast(`⚠️ Pipeline error: ${data.error || data.message}`, 'error');
+                    // Re-enable button on error
+                    btn.textContent = originalText;
+                    generateBtn.disabled = false;
+                    stopBtn.style.display = 'none';
                 }
             } catch (err) {
                 console.error('Error running pipeline:', err);
                 showToast('Error running pipeline: ' + err.message, 'error');
-            } finally {
+                // Re-enable button on error
                 btn.textContent = originalText;
-                btn.disabled = false;
+                generateBtn.disabled = false;
+                stopBtn.style.display = 'none';
             }
         }
 

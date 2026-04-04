@@ -135,14 +135,18 @@ class InsightDrivenBlogScheduler:
             logger.error(f"Error generating blog from insight: {e}")
             return None
     
-    def generate_blogs_for_all_accounts(self, insights: List[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def generate_blogs_for_all_accounts(self, insights: List[Dict[str, Any]] = None, accounts: List[str] = None) -> Dict[str, Any]:
         """
-        Generate blogs for all 5 accounts from insights.
+        Generate blogs for specified accounts from insights.
         
         For each account:
         - Take pending insights
         - Generate a blog variant for each insight
         - Store with account_id
+        
+        Args:
+            insights: List of insights to use. If None, fetches pending insights.
+            accounts: List of account IDs to generate for. If None, uses all accounts from Config.
         
         Returns: Summary of generation
         """
@@ -157,19 +161,26 @@ class InsightDrivenBlogScheduler:
             return {
                 "success": True,
                 "total_blogs": 0,
+                "articles_scraped": 0,
                 "accounts": {},
                 "message": "No pending insights"
             }
         
-        accounts = Config.ACCOUNTS
+        # Use specified accounts or all from Config
+        if accounts is None:
+            accounts_to_use = Config.ACCOUNTS
+        else:
+            # Filter Config.ACCOUNTS to only include specified account IDs
+            accounts_to_use = [acc for acc in Config.ACCOUNTS if acc["id"] in accounts]
+        
         total_blogs_generated = 0
         account_results = {}
         
-        logger.info(f"\nGenerating blogs for {len(accounts)} accounts from {len(insights)} insights")
+        logger.info(f"\nGenerating blogs for {len(accounts_to_use)} accounts from {len(insights)} insights")
         logger.info("=" * 80)
         
         # For each account
-        for account in accounts:
+        for account in accounts_to_use:
             account_id = account["id"]
             account_blogs = 0
             
@@ -217,18 +228,19 @@ class InsightDrivenBlogScheduler:
         return {
             "success": True,
             "total_blogs": total_blogs_generated,
+            "articles_scraped": len(insights),
             "accounts": account_results,
             "insights_processed": len(insights[:15])
         }
     
-    def run_once(self) -> Dict[str, Any]:
+    def run_once(self, accounts: List[str] = None) -> Dict[str, Any]:
         """Run insight-driven blog generation once."""
         logger.info("\n" + "=" * 80)
         logger.info("RUNNING INSIGHT-DRIVEN BLOG GENERATION")
         logger.info("=" * 80)
         
         try:
-            result = self.generate_blogs_for_all_accounts()
+            result = self.generate_blogs_for_all_accounts(accounts=accounts)
             self.close_mongo()
             return result
         except Exception as e:
@@ -246,11 +258,15 @@ def generate_blogs_from_insights_now(
     db: Database,
     generator: BlogGenerator,
     mongodb_uri: str,
-    mongodb_db: str
+    mongodb_db: str,
+    accounts: List[str] = None
 ) -> Dict[str, Any]:
     """
     Quick function to generate blogs from insights.
     Used for manual triggering from API endpoints.
+    
+    Args:
+        accounts: List of account IDs to generate for. If None, generates for all accounts.
     """
     scheduler = InsightDrivenBlogScheduler(db, generator, mongodb_uri, mongodb_db)
-    return scheduler.run_once()
+    return scheduler.run_once(accounts=accounts)
